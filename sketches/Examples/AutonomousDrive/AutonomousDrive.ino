@@ -8,13 +8,15 @@ DriveTrain drive;
 coroutine driveCoroutine;
 coroutine kalmanCoroutine;
 coroutine avoid;
-enum State {
+coroutine printData;
+enum Rover {
   TRACK,
   BACKUP,
   AVOID,
+  SUCCESS,
 };
 
-State machine;
+Rover machine;
 echo echo;
 
  double tolerance = kalman.tolerance;//Let's play with different values.
@@ -27,6 +29,7 @@ void setup() {
   // put your setup code here, to run once: 
   kalmanCoroutine.setup(10);
   driveCoroutine.setup(1000);
+  printData.setup(1500);
   avoid.setup(2000);
   drive.setup();
   kalman.setup();
@@ -34,6 +37,7 @@ void setup() {
   reset();
   forwards(0);
   calibrate();
+
 }
 
 void calibrate(){
@@ -51,12 +55,10 @@ void calibrate(){
     Serial.print(" Mag=");
     Serial.println(mag, DEC);
     delay(100);
-    Leftspin();
-    forwards(55);
+    drive.spin(50);
   }
 
   reset();
-  forwards(0);
   Serial.println(""); Serial.println("Calibrated");
   delay(2000);
 }
@@ -66,24 +68,25 @@ void loop() {
  kalmanCoroutine.loop();
  driveCoroutine.loop();
  avoid.loop();
+ printData.loop();
  if(kalmanCoroutine.readyState){
    echo.loop();
    tolerance = kalman.tolerance;//Let's play with different values.
    heading = kalman.orient.heading; //Kalman filters it for you.
    bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
    difference = abs(heading-bearing);
-     Serial.print("Heading: ");
-     Serial.print(heading);
-     Serial.print(" ||  Bearing: ");
-     Serial.println(bearing);
-     kalman.loop();
+   kalman.loop();
+     if(kalman.destinationReached()){
+        machine = SUCCESS;
+     }
   }
- delay(10);
-
-  if(echo.distance <= 80){
+  if(printData.readyState){
+    serializeData();
+  }
+  delay(10);
+  if(echo.distance <= 10){
     machine = BACKUP;
   }
-
   switch(machine){
 
     case BACKUP:
@@ -95,16 +98,20 @@ void loop() {
     case AVOID:
     avoidObstacle();
     break;
+    case SUCCESS:
+    haltRover();
+    break;
   }
 
  kalmanCoroutine.reset();
  driveCoroutine.reset();
  avoid.reset();
+ printData.reset();
 }
 
 void backup(){
   reset();
-  forwards(-90);
+  forwards(90);
    avoid.loop();
   if(avoid.readyState){
     machine = AVOID;
@@ -126,7 +133,6 @@ void avoidObstacle(){
 void followBearing(){
   forwards(90);
   wheelDirection = ((heading - bearing)/180) *100;
-  Serial.println(wheelDirection);
   if (abs(heading-bearing) < tolerance){
      reset();
   }else{
@@ -135,68 +141,45 @@ void followBearing(){
 }
 
 void forwards(int speed) {
-  // left side
-  drive.spinAt(25, speed);
-  drive.spinAt(21, speed);
-  drive.spinAt(20, speed);
-
-  // right side
-  drive.spinAt(27, -speed);
-  drive.spinAt(22, -speed);
-  drive.spinAt(28, -speed);
+  drive.forward(speed);
 }
 
 void spin(int r) {
-
-  // Front
-  drive.moveTo(23, r);
-  drive.moveTo(29, r);
-
-  // Back
-  drive.moveTo(24, -r);
-  drive.moveTo(26, -r);
-}
-
-void Rightspin() {
-
-  // Front
-  drive.moveTo(23, 50);
-  drive.moveTo(29, 50);
-
-  // Back
-  drive.moveTo(24, -50);
-  drive.moveTo(26, -50);
-}
-
-void Leftspin() {
-
-  // Front
-  drive.moveTo(23, -50);
-  drive.moveTo(29, -50);
-
-  // Back
-  drive.moveTo(24, 50);
-  drive.moveTo(26, 50);
+  drive.turn(r);
 }
 
 void reset() {
-  /* Turn right */
-  // front
-  drive.moveTo(23, 0);
-  drive.moveTo(29, 0);
+  drive.stop();
+}
 
-  // back
-  drive.moveTo(24, 0);
-  drive.moveTo(26, 0);
-
-  if(driveCoroutine.readyState){
-      /* Turn Left */
-    // front
-    drive.moveTo(23, 0);
-    drive.moveTo(29, 0);
-  
-    // back
-    drive.moveTo(24, 0);
-    drive.moveTo(26, 0);
+void haltRover(){
+  if(kalman.destinationReached()){
+      drive.stop();
+      drive.forward(0);
+  }else{
+    machine = TRACK;
   }
+
+}
+
+void serializeData(){
+     tolerance = kalman.tolerance;//Let's play with different values.
+   heading = kalman.orient.heading; //Kalman filters it for you.
+   bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
+   difference = abs(heading-bearing);
+     Serial.print("Heading: ");
+     Serial.print(heading);
+     Serial.print(" ||  Bearing: ");
+     Serial.println(bearing);
+     Serial.print("DISTANCE: ");
+     Serial.println(kalman.roverGPS.distance);
+     Serial.println(machine);
+     Serial.println(echo.distance);
+     Serial.print("LOCATION: ");
+     Serial.print(String(kalman.roverGPS.position.x(), 8));
+     Serial.print(" ");
+     Serial.println(String(kalman.roverGPS.position.y(), 8));
+     Serial.print("GPS RAW: ");
+     Serial.print(String(kalman.roverGPS.gps.latitudeDegrees, 8));
+     Serial.println(String(kalman.roverGPS.gps.longitudeDegrees, 8));
 }

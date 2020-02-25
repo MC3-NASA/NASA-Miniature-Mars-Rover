@@ -24,12 +24,13 @@ void RoverGPS::loop() {
 
 			position.x() =  gps.latitudeDegrees;//North and South.
 			position.y() = gps.longitudeDegrees;//East and West.
-			destination.x() = 40.081892; 
-			destination.y() = -75.163829;
+			destination.x() = 40.176011;//40.081892; 
+			destination.y() = -75.274020;//-75.163829;
 			speed = gps.speed;
 		}
 
 		calculateBearing(position.x(), position.y(), destination.x(), destination.y()); //Recalculates every 1 seconds.
+		calculateDistance(position.x(), position.y(), destination.x(), destination.y()); //Recalculates every 1 seconds.
 	}
 
 	

@@ -3,7 +3,7 @@
 //#define DEBUG
 
 
-Wheel::Wheel(byte id, State type) {
+Wheel::Wheel(byte id, MotorState type) {
 	_id = id;
 	_msState = type;
 }
@@ -26,6 +26,18 @@ void Wheel::stop() {
 
 
 void DriveTrain::setup() {
+	layout.leftTop = 25;
+  	layout.leftMid = 21;
+  	layout.leftBack = 20;
+  	layout.rightTop = 27;
+  	layout.rightMid = 22;
+  	layout.rightBack = 28;
+  	layout.leftTopS = 23;
+  	layout.leftBottomS = 24;
+  	layout.rightTopS = 29;
+  	layout.rightBottomS = 26;
+	
+	
 	 for(int i = 0; i < 3; i++) {
 		wheels[i] = Wheel(layout.motorsLeft[i], MOTORL);
 	 }
@@ -46,8 +58,6 @@ void DriveTrain::setup() {
 }
 
 void DriveTrain::forward(float speed) {
-	turn(0);
-	
 	for(int i = 0; i < 6; i++) {
 		
 		#ifdef DEBUG
@@ -66,8 +76,6 @@ void DriveTrain::forward(float speed) {
 }
 
 void DriveTrain::backward(float speed) {
-	turn(0);
-	
 	for(int i = 0; i < 6; i++) {
 		if(wheels[i]._msState == MOTORL) {
 			
@@ -105,8 +113,6 @@ void DriveTrain::turn(float angle) {
 
 
 void DriveTrain::spin(float speed) {
-	stop();
-	
 	for(int i = 6; i < 10; i++) {
 		
 		#ifdef DEBUG

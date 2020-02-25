@@ -22,6 +22,7 @@ public:
 	imu::Vector<3> velocity = imu::Vector<3>(0, 0, 0);
 	imu::Vector<3> acceleration = imu::Vector<3>(0, 0, 0);
 	imu::Vector<3> averageCalibration = imu::Vector<3>(0, 0, 0);
+	imu::Vector<3> orientationG = imu::Vector<3>(0, 0, 0);
 
 	double heading = 0.0f;//Gets the heading for the rover.
 	double incline = 0.0f;//Gets the incline of the rover from 180 to -180.
@@ -45,5 +46,6 @@ public:
 	void callibrateCompass();
 	void computeCompass(sensors_event_t *event);
 	void applyForwardsForce(double f);
+	void computeAngle();
 	String serialize();
 };

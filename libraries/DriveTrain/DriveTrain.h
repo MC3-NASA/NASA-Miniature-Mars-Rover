@@ -20,11 +20,11 @@ struct DriveTrainLayout {
 	};
 };
 
-typedef enum {MOTORL, MOTORR, SERVOL, SERVOR, NA} State;// States an individual servo can be in dependent on the orientation(LEFT, RIGHT)
+typedef enum {MOTORL, MOTORR, SERVOL, SERVOR, NA} MotorState;// States an individual servo can be in dependent on the orientation(LEFT, RIGHT)
 
 class Wheel {
 	public:
-	Wheel(byte, State);
+	Wheel(byte, MotorState);
 	Wheel() {_id = 0; _msState = NA; }
 	void forward(float);					// forward speed
 	void backward(float);					// backward speed
@@ -33,7 +33,7 @@ class Wheel {
 	
 	public:
 	byte _id;
-	State _msState;
+	MotorState _msState;
 };
 
 class DriveTrain {
