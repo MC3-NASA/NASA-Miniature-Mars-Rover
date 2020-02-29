@@ -69,7 +69,7 @@ void orientation::callibrateCompass() {
 }
 
 void orientation::computeCompass(sensors_event_t * event) {
-	heading = fmod(360 + toDegrees(quaternion.toEuler().x()), 360);
+	heading = fmod(360 + toDegrees(-quaternion.toEuler().x()), 360);
 	incline = -toDegrees(quaternion.toEuler().z());
 }
 

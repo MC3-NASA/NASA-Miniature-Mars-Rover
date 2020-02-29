@@ -1,4 +1,9 @@
-#define BNO055_SAMPLERATE_DELAY_MS (100)
+/*
+ * Created by Noah Williams.
+ * Purpose: To test the IMU device.
+ */
+
+#define BNO055_SAMPLERATE_DELAY_MS (1000)
 #include <kalmanFilter.h>
 #include <coroutine.h>
 kalmanFilter kalman;
@@ -20,7 +25,6 @@ void loop() {
   serialCoroutine.loop();
   if(serialCoroutine.readyState){
      kalman.serialize();
-     serialCoroutine.reset(); 
   }
     if(kalman.destinationReached()){
     digitalWrite(6, HIGH);
@@ -35,6 +39,7 @@ void loop() {
   }else{
     digitalWrite(7, LOW);
   }
+  serialCoroutine.reset(); 
 }
 
 void calibrate(){
