@@ -47,5 +47,6 @@ public:
 	void computeCompass(sensors_event_t *event);
 	void applyForwardsForce(double f);
 	void computeAngle();
+	float distanceTraveled = 0.0f; //Meters
 	String serialize();
 };

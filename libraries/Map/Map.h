@@ -5,6 +5,7 @@
 #include <sphereNode.h>
 #include <Vector3D.h>
 #include <save.h>
+
 class Map
 {
 	// var
@@ -36,4 +37,6 @@ public:
 
 	void setup();
 	void loop();
+	//void WayPointHandler();
+	void loadWayPoints();
 };

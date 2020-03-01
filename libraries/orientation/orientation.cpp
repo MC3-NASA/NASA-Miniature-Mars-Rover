@@ -197,6 +197,7 @@ void orientation::applyForwardsForce(double f){
 	forwardsVector = quaternion.rotateVector(forwards);//Performs the hamilton product using cross products.
 
 	position = position+(forwardsVector*f);
+	distanceTraveled = sqrt(position.x()*position.x() + position.y()*position.y());
 }
 
 //Infinite Impulse Response
@@ -220,8 +221,8 @@ String orientation::serialize() {
 	 z = position.z();
 	value = (String)"roverP" + String(x, 6) + "," + String(y, 6) + "," + String(z, 6);
 	Serial.println(value);
-
-
+	value = (String)"Total Distance: " + String(distanceTraveled, 6); 
+	Serial.println(value);
 
 	//Additional Serializations
 

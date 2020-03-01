@@ -83,6 +83,7 @@ void Map::loadMap(){
 	mapLoader.loadMap("MAPROVER.txt", GlobalMap, &latitude, &longitude, &zoom);
 }
 
+
 void Map::printMap(){
 	for(int i = 0; i < 64; i++){
 		for(int j = 0; j < 64; j++){
@@ -110,4 +111,9 @@ imu::Vector<2> Map::getRealPosition(int x, int y, imu::Vector<2> vec){
 	vec.x() = latFinal;
 	vec.y() = lonFinal;
     return vec;
+}
+
+//Loads just a list of points instead of entire map. Can load up to 12 points.
+void Map::loadWayPoints(){
+	mapLoader.loadMap("WAYPOINTS.txt", GlobalMap, &latitude, &longitude, &zoom);
 }

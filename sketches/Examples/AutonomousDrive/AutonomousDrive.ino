@@ -37,7 +37,9 @@ void setup() {
   reset();
   forwards(0);
   calibrate();
-
+  kalman.roverGPS.setDestinations(40.176001, -75.274005, 0); //First tree south tree.
+  //kalman.roverGPS.setDestinations(40.176103, -75.273777, 1); //Second east tree.
+  //kalman.roverGPS.setDestinations(40.176275, -75.274011, 2); //Third starting point.
 }
 
 void calibrate(){
@@ -84,7 +86,7 @@ void loop() {
     serializeData();
   }
   delay(10);
-  if(echo.distance <= 10){
+  if(echo.distance <= 50){
     machine = BACKUP;
   }
   switch(machine){
@@ -167,6 +169,8 @@ void serializeData(){
    heading = kalman.orient.heading; //Kalman filters it for you.
    bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
    difference = abs(heading-bearing);
+   kalman.roverGPS.serialize();
+   /*
      Serial.print("Heading: ");
      Serial.print(heading);
      Serial.print(" ||  Bearing: ");
@@ -182,4 +186,5 @@ void serializeData(){
      Serial.print("GPS RAW: ");
      Serial.print(String(kalman.roverGPS.gps.latitudeDegrees, 8));
      Serial.println(String(kalman.roverGPS.gps.longitudeDegrees, 8));
+     */
 }

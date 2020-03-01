@@ -5,13 +5,17 @@ void RoverGPS::setup() {
 	gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
 	gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
 	gps.sendCommand(PGCMD_ANTENNA);
+	destinations = new Destination();
+	headDestination = destinations;
 	delay(1000);
 
 }
 
 void RoverGPS::loop() {
-
+	
 	gps.read();
+	destination.x() = destinations->destination.x();
+	destination.y() = destinations->destination.y();
 	if (gps.newNMEAreceived()) {
 		gps.lastNMEA();
 		if (!gps.parse(gps.lastNMEA()))
@@ -24,8 +28,8 @@ void RoverGPS::loop() {
 
 			position.x() =  gps.latitudeDegrees;//North and South.
 			position.y() = gps.longitudeDegrees;//East and West.
-			destination.x() = 40.176011;//40.081892; 
-			destination.y() = -75.274020;//-75.163829;
+			//destination.x() = 40.176011;//40.081892; 
+			//destination.y() = -75.274020;//-75.163829;
 			speed = gps.speed;
 		}
 
@@ -92,4 +96,34 @@ void RoverGPS::serialize() {
 	Serial.print(bearing);
 	Serial.print(" | ");
 	Serial.println(String(distance, 8));
+	Destination* current = headDestination->next;
+	while(current != NULL){
+	value = (String)"STROED Destinations: " + String(current->destination.x(), 8) + "," + String(current->destination.y(), 8);
+	Serial.println(value);
+	current = current->next;
+	}
 }
+
+void RoverGPS::setDestinations(double x, double y, int index){
+	Destination* current = headDestination;
+	for(int i = 0; i < index; i++){
+		current = current->next;
+	}
+	current->next = new Destination();
+	current = current->next;
+	current->destination.x() = x;
+	current->destination.y() = y;
+}
+
+//Returns true if all destinations have been reached.
+bool RoverGPS::traverseDestination(){
+	if(destinations->next != NULL){
+		destinations = destinations->next;
+		return false;
+	}else{
+		return true;
+	}
+
+}
+
+

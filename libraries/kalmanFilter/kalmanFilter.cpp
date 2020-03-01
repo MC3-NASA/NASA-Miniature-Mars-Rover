@@ -106,8 +106,16 @@ void kalmanFilter::calibrate() {
 }
 
 bool kalmanFilter::destinationReached(){
-	if(roverGPS.distance <= 2){
-		return true;
+	//Multi passes before the real condition check.
+	//Checks if signal is given.
+	if(roverGPS.destination.x() < 0.5f || roverGPS.destination.y() < 0.5f){
+		//return roverGPS.traverseDestination();
+	}
+	if(roverGPS.position.x() < 0.5f || roverGPS.position.y() < 0.5f){
+		return false;
+	}
+	if(roverGPS.distance <= destinationRadius){
+		return roverGPS.traverseDestination();
 	}
 	return false;
 }

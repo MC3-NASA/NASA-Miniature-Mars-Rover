@@ -116,7 +116,7 @@ void save :: loadMap(char *str, char roverMap[64][64], float*lat, float*lon, int
 
 int save :: processString(String procString, float *value, int indexS){
   String buffer = "";
-  while(procString[indexS] != ','){
+  while(procString[indexS] != ',' && procString[indexS] != '\0'){
 	  buffer += procString[indexS];
 	  indexS++;
   }
