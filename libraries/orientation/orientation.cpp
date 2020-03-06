@@ -187,7 +187,10 @@ void orientation::trapezoidalIntegration() {
 	//position.y() = position.y() + basevelocityy + ((abs(velocity.y()) - basevelocityy) / 2);
 
 	position.z() = position.z() + basevelocityz + ((abs(velocity.z()) - basevelocityz) / 2);
-	applyForwardsForce(forceX+forceY);
+	if(abs(acceleration.x()) > tolerance || abs(acceleration.y()) > tolerance){
+		applyForwardsForce(forceX+forceY);
+	}
+
 }
 
 
@@ -254,5 +257,7 @@ String orientation::serialize() {
 	*/
 	Serial.print("HEADING: ");
 	Serial.println(heading);
+	Serial.print("INCLINE: ");
+	Serial.println(incline);
 	return value;
 }

@@ -93,7 +93,7 @@ void DriveTrain::backward(float speed) {
 	}
 }
 
-void DriveTrain::turn(float angle) {
+void DriveTrain::turn(float angle, byte motors) {
 	for(int i = 6; i < 10; i++) {
 		
 		#ifdef DEBUG
@@ -104,9 +104,11 @@ void DriveTrain::turn(float angle) {
 		#endif
 		
 		if(wheels[i]._msState == SERVOL) {
-			wheels[i].turn(angle);
+			if(wheels[i]._id == layout.leftTopS)		(((motors) & (1<<(0)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+			if(wheels[i]._id == layout.leftBottomS)		(((motors) & (1<<(1)))) ?  wheels[i].turn(-angle) : wheels[i].turn(0);
 		}else if(wheels[i]._msState == SERVOR) {
-			wheels[i].turn(angle);
+			if(wheels[i]._id == layout.rightTopS)		(((motors) & (1<<(2)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+			if(wheels[i]._id == layout.rightBottomS)	(((motors) & (1<<(3)))) ?  wheels[i].turn(-angle) : wheels[i].turn(0);
 		}
 	}
 }

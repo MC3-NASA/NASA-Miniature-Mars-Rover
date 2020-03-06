@@ -118,9 +118,11 @@ void RoverGPS::setDestinations(double x, double y, int index){
 //Returns true if all destinations have been reached.
 bool RoverGPS::traverseDestination(){
 	if(destinations->next != NULL){
-		destinations = destinations->next;
+		destinations = destinations->next; 
+		Serial.println("TRUE");
 		return false;
 	}else{
+		Serial.println("FALSE");
 		return true;
 	}
 

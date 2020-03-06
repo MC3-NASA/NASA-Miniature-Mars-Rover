@@ -21,6 +21,7 @@ struct DriveTrainLayout {
 };
 
 typedef enum {MOTORL, MOTORR, SERVOL, SERVOR, NA} MotorState;// States an individual servo can be in dependent on the orientation(LEFT, RIGHT)
+typedef enum {LEFTTOP = (0x81), LEFTBOTTOM = (0x82), RIGHTTOP = (0x84), RIGHTBOTTOM = (0x88)} MotorsReg;
 
 class Wheel {
 	public:
@@ -46,7 +47,7 @@ class DriveTrain {
 	void backward(float);					// similar to forward but reverse(technically not nessarcy but separate implementation for naming purpose)
 	void spin(float);						// Spin in place for speed
 	void stop();							// Stops all motors and all servo are set to angle zero
-	void turn(float); 						// turn a specified angle for all turning motors
+	void turn(float, byte); 					// turn a specified angle for all turning motors
 };
 
 

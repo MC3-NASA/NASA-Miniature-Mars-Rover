@@ -8,7 +8,7 @@ class kalmanFilter {
 		imu::Vector<3> averageCalibration = imu::Vector<3>(0, 0, 0);
 
 		imu::Vector<2> location = imu::Vector<2>(0, 0); //The final location, when all is filtered and finished. Latitiude = x, Longitude = y.
-		double tolerance = 1.0;
+		double tolerance = 3.0;
 		orientation orient;
 		RoverGPS roverGPS;
 
@@ -19,7 +19,7 @@ class kalmanFilter {
 		void serialize();
 		void predict();
 		bool destinationReached();
-		float destinationRadius= 6.0f; //How close until destination is conisdered reached.
+		float destinationRadius = 10.0f; //How close until destination is conisdered reached.
 
 
 

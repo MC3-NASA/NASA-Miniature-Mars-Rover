@@ -1,3 +1,7 @@
+/*
+ * Created by Noah Williasm
+ */
+
 #include <DriveTrain.h> //Deals with spinning the wheels of the rover.
 #include <kalmanFilter.h> //Gets IMU device for the rover
 #include "coroutine.h"
@@ -40,6 +44,7 @@ void setup() {
   kalman.roverGPS.setDestinations(40.176001, -75.274005, 0); //First tree south tree.
   //kalman.roverGPS.setDestinations(40.176103, -75.273777, 1); //Second east tree.
   //kalman.roverGPS.setDestinations(40.176275, -75.274011, 2); //Third starting point.
+  kalman.roverGPS.traverseDestination();
 }
 
 void calibrate(){
@@ -71,13 +76,16 @@ void loop() {
  driveCoroutine.loop();
  avoid.loop();
  printData.loop();
+ kalman.roverGPS.loop();
  if(kalmanCoroutine.readyState){
+   kalman.loop();
    echo.loop();
    tolerance = kalman.tolerance;//Let's play with different values.
    heading = kalman.orient.heading; //Kalman filters it for you.
    bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
    difference = abs(heading-bearing);
-   kalman.loop();
+
+ kalmanCoroutine.reset();
      if(kalman.destinationReached()){
         machine = SUCCESS;
      }
@@ -85,8 +93,7 @@ void loop() {
   if(printData.readyState){
     serializeData();
   }
-  delay(10);
-  if(echo.distance <= 50){
+  if(echo.distance <= 10){
     machine = BACKUP;
   }
   switch(machine){
@@ -105,7 +112,7 @@ void loop() {
     break;
   }
 
- kalmanCoroutine.reset();
+
  driveCoroutine.reset();
  avoid.reset();
  printData.reset();
@@ -113,7 +120,7 @@ void loop() {
 
 void backup(){
   reset();
-  forwards(90);
+  forwards(-80);
    avoid.loop();
   if(avoid.readyState){
     machine = AVOID;
@@ -122,8 +129,8 @@ void backup(){
 }
 
 void avoidObstacle(){
-  forwards(60);
-  spin(50);
+  forwards(80);
+  spin(50, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
   avoid.loop();
   if(avoid.readyState){
     machine = TRACK;
@@ -133,12 +140,15 @@ void avoidObstacle(){
 }
 
 void followBearing(){
-  forwards(90);
-  wheelDirection = ((heading - bearing)/180) *100;
+   wheelDirection = ((-heading + bearing)/180) *200;
+   if(wheelDirection > 100){
+    wheelDirection = 90;
+   }
   if (abs(heading-bearing) < tolerance){
      reset();
   }else{
-    spin(wheelDirection);
+    forwards(90);
+    spin(wheelDirection, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
   }
 }
 
@@ -146,8 +156,8 @@ void forwards(int speed) {
   drive.forward(speed);
 }
 
-void spin(int r) {
-  drive.turn(r);
+void spin(int r, int motors) {
+  drive.turn(r, motors);
 }
 
 void reset() {
@@ -169,8 +179,7 @@ void serializeData(){
    heading = kalman.orient.heading; //Kalman filters it for you.
    bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
    difference = abs(heading-bearing);
-   kalman.roverGPS.serialize();
-   /*
+   //kalman.roverGPS.serialize();
      Serial.print("Heading: ");
      Serial.print(heading);
      Serial.print(" ||  Bearing: ");
@@ -183,8 +192,11 @@ void serializeData(){
      Serial.print(String(kalman.roverGPS.position.x(), 8));
      Serial.print(" ");
      Serial.println(String(kalman.roverGPS.position.y(), 8));
+          Serial.print("DESTINATION: ");
+     Serial.print(String(kalman.roverGPS.destination.x(), 8));
+     Serial.print(" ");
+     Serial.println(String(kalman.roverGPS.destination.y(), 8));
      Serial.print("GPS RAW: ");
      Serial.print(String(kalman.roverGPS.gps.latitudeDegrees, 8));
      Serial.println(String(kalman.roverGPS.gps.longitudeDegrees, 8));
-     */
 }

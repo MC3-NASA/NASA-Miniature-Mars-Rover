@@ -100,9 +100,9 @@ void findPath(){
 }
 
 //Converts an index of the GlobaMap to a real world location, return latitude, and longitude.
-imu::Vector<2> Map::getRealPosition(int x, int y, imu::Vector<2> vec){
-	x = floor(x/10)*10;
-	y = floor(y/10)*10;
+imu::Vector<2> Map::getRealPosition(float x, float y, imu::Vector<2> vec){
+	x = floor(x/10*10)*10;
+	y = floor(y/10*10)*10;
 	double multiplier = cos(latitude * M_PI / 180);
     double degreesPerPixelX = 360 / pow(2, zoom + 8);
     double degreesPerPixelY = 360 / pow(2, zoom + 8) *multiplier;
