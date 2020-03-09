@@ -2,49 +2,87 @@
  * Created by Noah Williams.
  * Purpose: Loads waypoints given by Unity. This is an isolated example to be used for testing purposes.
  */
+ 
  #include <SerialCommand.h>
  #include <save.h>
- #include <RoverGPS.h>
  #include <Map.h>
+ #include <AutonomousDrive.h>
+AutonomousDrive autoDrive;
  SerialCommand sCmd; //Get serial commands from Virtual Rover (Unity)
  save save;
  Map internalMap;
+ RoverGPS roverGPS;
+ coroutine printCoroutine;
  int loadingMap = 1; //Determines if loading map. 0 no load, 1 is loading.
- float centralLat = 40.176001;//-1;
- float centralLon = -75.274005;//-1;
- float dests[13];
+ float centralLat = -1;
+ float centralLon = -1;
+ float dests[16];
+ int readyToDrive = 0;
+
+
+enum BootLoads {
+        UNITY,
+        DRIVE,
+        SETUPDRIVE,
+};
+
+BootLoads bootloader = UNITY;
 void setup() {
+  roverGPS.setup();
+  printCoroutine.setup(3000);
   // put your setup code here, to run once:
   sCmd.addCommand("W#W", WayPointHandler); //Command when recieved a list of way points.
   sCmd.addCommand("L#L", LatLonHandler); //Command when recieved a list of way points.
   sCmd.addCommand("S#S", stopHandler); //Stops recieving points.
-  internalMap.latitude = 40.176001;
-  internalMap.longitude = -75.274005;
-  /*
-  while(loadingMap >0){
-    sCmd.readSerial();
-  }
-  */
+  sCmd.addCommand("D#D", driveHandler); //Goes into Drive
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-   if (Serial.available() > 0)
-   {
-      sCmd.readSerial();
-   }
-   for(int i = 0; i < 12; i++){
-    Serial.println("");
-    Serial.print(String(dests[i], 15));
-    Serial.print(", ");
-    i++;
-    Serial.print(String(dests[i], 15));
+  switch(bootloader){
 
-   }
-   delay(3000);
+    case UNITY:
+    updateSerialCommunicator();
+    break;
+    case DRIVE:
+    autoDrive.loop();
+    break;
+    case SETUPDRIVE:
+    setupAutoDrive();
+    break;
+  }
 
 }
 
+void setupAutoDrive(){
+  bootloader = DRIVE;
+  for(int i = 0; i <= 10; i++){
+     autoDrive.kalman.destinations[i] = (double)dests[i];
+  }
+
+  autoDrive.setup();
+}
+
+
+void updateSerialCommunicator(){
+  roverGPS.loop();
+  printCoroutine.loop();
+  if(printCoroutine.readyState){
+      String value = "LOC" + String(roverGPS.position.x(), 15) + "," + String(roverGPS.position.y(), 15);
+      Serial.println(value);
+       if (Serial.available() > 0)
+       {
+          sCmd.readSerial();
+       }
+       for(int i = 0; i < 16; i++){
+        Serial.print(String(dests[i], 15));
+        Serial.print(", ");
+        i++;
+        Serial.println(String(dests[i], 15));
+        
+      }
+      printCoroutine.reset();
+  }
+}
 //When Unity Sends Lat and Lon data, this processes it into a floats.
 //Gets the central Lat and Lon to be used for processing image data.
 void LatLonHandler () {
@@ -56,7 +94,9 @@ void LatLonHandler () {
       indexS=save.processString(String(arg), &centralLat, indexS);
       save.processString(String(arg), &centralLon, indexS);
   }
-  Serial.println("W_W");
+  //Serial.println("W_W");
+  internalMap.latitude = centralLat;
+  internalMap.longitude = centralLon;
   delay(10);
 }
 
@@ -67,14 +107,21 @@ void WayPointHandler() {
   arg = sCmd.next();
   if (arg != NULL)
   {
-    String processStr = "h";
+    String processStr = "";
     processStr += String(arg);
     //Ensures Central Lat/Lon has recieved data.
     if(abs(centralLat) >= 0 && abs(centralLon) >= 0){
-      int i = 0; //Index of destinations set.
       int indexS = 0; //Index of the string.
       int x = 0;
       int y = 0;
+
+      int i = 0; //Index of destinations set.
+      if(processStr[indexS] == 'A') //Then this is first array of destinations.
+      {
+       i = 0; //Index of destinations set.
+      }else{ //Then this is second.
+        i = 8;
+      }
       //Set the destinations:
       while(processStr[indexS] != '\0'){
         indexS++;
@@ -83,9 +130,6 @@ void WayPointHandler() {
         while(processStr[indexS] != ',' && processStr[indexS] != '\0'){
           buff += processStr[indexS];
           indexS++;
-        }
-        if(processStr[indexS] == '\0'){
-          break;
         }
         //If it is the first index, then x value, if second then y value. Also set destination when y value.
         if((i%2) == 0){
@@ -105,5 +149,16 @@ void WayPointHandler() {
 }
 
 void stopHandler () {
-  loadingMap = 0;
+  if( bootloader == UNITY){
+  loadingMap = 1;
+  bootloader = SETUPDRIVE;
+  Serial.println("S_S");
+}
+
+}
+
+void driveHandler(){
+  if(bootloader == UNITY){
+     bootloader = SETUPDRIVE;
+  }
 }

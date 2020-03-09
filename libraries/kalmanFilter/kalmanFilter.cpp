@@ -3,6 +3,14 @@
 void kalmanFilter::setup() {
 	roverGPS.setup();
 	orient.setup();
+	//Inserts destinations into roverGPS.
+  	for(int i = 0; i <= 8; i+=2){
+		if( (abs(destinations[i])> 0) && (abs(destinations[i+1]) > 0) )
+		{
+			roverGPS.setDestinations(destinations[i],destinations[i+1], floor(i/2));
+		}
+
+  	}
 	calibrate();
 	/*
 	Q.vector_to_row(imu::Vector<2>(averageCalibration.y(), 0),0);
@@ -34,7 +42,7 @@ void kalmanFilter::setup() {
 
 void kalmanFilter::loop() {
 	orient.loop();
-	roverGPS.loop();
+	//roverGPS.loop();
 	roverGPS.updateDistanceBearing(roverGPS.position, roverGPS.destination);
 }
 
@@ -108,10 +116,10 @@ void kalmanFilter::calibrate() {
 bool kalmanFilter::destinationReached(){
 	//Multi passes before the real condition check.
 	//Checks if signal is given.
-	if(abs(roverGPS.destination.x()) < 0.5f || abs(roverGPS.destination.y()) < 0.5f){
+	if(abs(roverGPS.destination.x()) <= 0 || abs(roverGPS.destination.y()) <= 0){
 		//return roverGPS.traverseDestination();
 	}
-	if(abs(roverGPS.position.x()) < 0.5f || abs(roverGPS.position.y()) < 0.5f){
+	if(abs(roverGPS.position.x()) <= 0 || abs(roverGPS.position.y()) <= 0){
 		return false;
 	}
 	if(roverGPS.distance <= destinationRadius){

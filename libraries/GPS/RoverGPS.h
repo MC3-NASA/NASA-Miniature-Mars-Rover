@@ -17,8 +17,8 @@ public:
 	Adafruit_GPS gps;
 	Destination* destinations; //The current destination.
 	Destination* headDestination;
-	imu::Vector<2> destination = imu::Vector<2>(0, 0);
-	imu::Vector<2> position = imu::Vector<2>(0, 0);
+	imu::Vector<2> destination = imu::Vector<2>(-1, -1);
+	imu::Vector<2> position = imu::Vector<2>(-1, -1);
 	double distance; //Distance in meters between two points.
 	uint32_t timer = millis();
 	double speed;

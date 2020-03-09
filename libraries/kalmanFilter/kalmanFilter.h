@@ -20,6 +20,7 @@ class kalmanFilter {
 		void predict();
 		bool destinationReached();
 		float destinationRadius = 10.0f; //How close until destination is conisdered reached.
+		double destinations[10];
 
 
 
