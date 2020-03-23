@@ -48,6 +48,7 @@ class DriveTrain {
 	void spin(float);						// Spin in place for speed
 	void stop();							// Stops all motors and all servo are set to angle zero
 	void turn(float, byte); 					// turn a specified angle for all turning motors
+	void turn(float, int, byte);
 };
 
 

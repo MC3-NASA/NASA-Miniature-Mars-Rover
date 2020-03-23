@@ -113,6 +113,70 @@ void DriveTrain::turn(float angle, byte motors) {
 	}
 }
 
+void DriveTrain::turn(float angle, int speed, byte motors) {
+  /*int negativeOne = 1;
+  if(angle < 0)                               negativeOne = -1;
+  if(angle > 0)                               negativeOne = 1;
+  
+  for(int i = 0; i < 10; i++) {
+    if(wheels[i]._msState == SERVOL) {
+		if(wheels[i]._id == layout.leftTopS)	    (((motors) & (1<<(0)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+		if(wheels[i]._id == layout.leftBottomS)		(((motors) & (1<<(1)))) ?  wheels[i].turn((angle * negativeOne)) : wheels[i].turn(0);
+	}else if(wheels[i]._msState == SERVOR) {
+		if(wheels[i]._id == layout.rightTopS)     	(((motors) & (1<<(2)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+		if(wheels[i]._id == layout.rightBottomS)	(((motors) & (1<<(3)))) ?  wheels[i].turn(-(angle * negativeOne)) : wheels[i].turn(0);
+	}
+ 
+    if(wheels[i]._msState == MOTORL) {
+		if(wheels[i]._id == layout.leftTop)     	wheels[i].forward(speed);
+		if(wheels[i]._id == layout.leftMid)     	(angle < 0) ? wheels[i].forward(-speed) : wheels[i].forward(speed);
+		if(wheels[i]._id == layout.leftBack)		  wheels[i].forward((speed));
+	}else if(wheels[i]._msState == MOTORR) {
+		if(wheels[i]._id == layout.rightTop)		wheels[i].forward(-speed);
+		if(wheels[i]._id == layout.rightMid)		(angle > 0) ? wheels[i].forward(speed) : wheels[i].forward(-speed);
+		if(wheels[i]._id == layout.rightBack)		wheels[i].forward((speed));
+	}
+  }*/
+  
+	for(int i = 0; i < 6; i++) {
+		
+		#ifdef DEBUG
+			Serial.println("Forward");
+			Serial.print("Motor Wheel id: ");
+			Serial.println(wheels[i]._id);
+			Serial.println("");
+		#endif
+		
+		if(wheels[i]._msState == MOTORL) {
+			if(wheels[i]._id == layout.leftMid)     	(angle < 0) ? wheels[i].forward(-speed) : wheels[i].forward(speed);
+			else	wheels[i].forward(speed);
+		}else if(wheels[i]._msState == MOTORR) {
+			if(wheels[i]._id == layout.rightMid)		(angle > 0) ? wheels[i].forward(speed) : wheels[i].forward(-speed);
+			else	wheels[i].forward(-speed);
+		}
+	}
+
+  for(int i = 6; i < 10; i++) {
+		
+		#ifdef DEBUG
+			Serial.println("Turn");
+			Serial.print("Motor Wheel id: ");
+			Serial.println(wheels[i]._id);
+			Serial.println("");
+		#endif
+		
+		if(wheels[i]._msState == SERVOL) {
+			if(wheels[i]._id == layout.leftTopS)		(((motors) & (1<<(0)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+			if(wheels[i]._id == layout.leftBottomS)		(((motors) & (1<<(1)))) ?  wheels[i].turn(-angle) : wheels[i].turn(0);
+		}else if(wheels[i]._msState == SERVOR) {
+			if(wheels[i]._id == layout.rightTopS)		(((motors) & (1<<(2)))) ?  wheels[i].turn(angle) : wheels[i].turn(0);
+			if(wheels[i]._id == layout.rightBottomS)	(((motors) & (1<<(3)))) ?  wheels[i].turn(-angle) : wheels[i].turn(0);
+		}
+	}
+	
+	
+}
+
 
 void DriveTrain::spin(float speed) {
 	for(int i = 6; i < 10; i++) {

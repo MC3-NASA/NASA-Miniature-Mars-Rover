@@ -1,6 +1,8 @@
 /*
  * Created by Noah Williams.
  * Purpose: Loads waypoints given by Unity. This is used for VirtualRover
+ * 
+ * No setup required. This will automatically set points and give information if that point is reachable.
  */
  
  #include <SerialCommand.h>
@@ -12,7 +14,12 @@
  */
  int detectionRange = 50; //Centimeters, CHANGES HOW FAR ULTRASOUND DETECTS OBSTACLE
 
- 
+
+
+
+
+
+//Do not touch below
 AutonomousDrive autoDrive;
  SerialCommand sCmd; //Get serial commands from Virtual Rover (Unity)
  save save;

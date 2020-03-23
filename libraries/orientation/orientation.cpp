@@ -1,3 +1,7 @@
+/*
+* Created by Noah Williams.
+*/
+
 #include "orientation.h"
 
 /* Set the delay between fresh samples */
@@ -68,6 +72,7 @@ void orientation::callibrateCompass() {
 	delay(2000);
 }
 
+//Computes the compass heading. Finds which direction rover should travel to follow GPS.
 void orientation::computeCompass(sensors_event_t * event) {
 	heading = fmod(360 + toDegrees(-quaternion.toEuler().x()), 360);
 	incline = -toDegrees(quaternion.toEuler().z());

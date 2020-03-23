@@ -20,13 +20,27 @@ void AutonomousDrive::setup() {
   kalman.roverGPS.traverseDestination();
 }
 
+void AutonomousDrive::setup(bool IsManual) {
+  // put your setup code here, to run once: 
+  kalmanCoroutine.setup(10);
+  driveCoroutine.setup(1000);
+  printData.setup(1000);
+  avoid.setup(2000);
+  drive.setup();
+  kalman.setup();
+  echosensor.setup();
+  reset();
+  forwards(0);
+  calibrate();
+}
+
 void AutonomousDrive::calibrate(){
-  forwards(55);
+  forwards(25);
   uint8_t system, gyro, accel, mag = 0;
   while (system != 3)
   {
     kalman.orient.bno.getCalibration(&system, &gyro, &accel, &mag);
-    Serial.print("CALIBRATION: Sys=");
+    Serial.print("CALIBRATING PLEASE SPIN AROUND!   sys=");
     Serial.print(system, DEC);
     Serial.print(" Gyro=");
     Serial.print(gyro, DEC);
@@ -39,8 +53,9 @@ void AutonomousDrive::calibrate(){
   }
 
   reset();
-  Serial.println(""); Serial.println("Calibrated");
-  delay(2000);
+  forwards(0);
+  Serial.println(""); Serial.println("Calibration Done. Please place Rover down.");
+  delay(5000);
 }
 
 void AutonomousDrive::loop() {
@@ -66,7 +81,7 @@ void AutonomousDrive::loop() {
   if(printData.readyState){
     serializeData();
   }
-  if(echosensor.distance <= 10){
+  if(echosensor.distance <= detectionRange){
     machine = BACKUP;
   }
   switch(machine){
@@ -112,15 +127,39 @@ void AutonomousDrive::avoidObstacle(){
   
 }
 
+//Determines which direction wheels will move in during turning.
 void AutonomousDrive::followBearing(){
+    float angle1 = ((bearing - heading) / 180) * 100;
+    float angle2 = (((bearing+360) - heading) / 180) * 100;
+    float angle3 = (((bearing - 360) - heading) / 180) * 100;
+    if (abs(angle1) < abs(angle2) && abs(angle1) < abs(angle3))
+    {
+        wheelDirection = angle1;
+    }
+    else if (abs(angle2) < abs(angle3) && abs(angle2) < abs(angle3))
+    {
+        wheelDirection = angle2;
+    }
+    else
+    {
+        wheelDirection = angle3;
+    }
+    //Clamps the values.
+    if(wheelDirection > 90){
+      wheelDirection = 90;
+    }else if(wheelDirection < -90){
+      wheelDirection = -90;
+    }
   //wheelDirection = ((-heading + bearing)/180) *100;
+  
+  /*
   float wheelDirection = ((180 - abs(abs(bearing-heading)-180))/180) *100; //The magnitude. Decides how much to turn.
   float diff = heading- bearing;
   if(diff < 0) //Determines the shortest angle to turn to.
      diff += 360;
   if(diff > 180)
-     wheelDirection *= -1; // left turn
-          
+     wheelDirection *= -1;// left turn
+  */
   if (abs(heading-bearing) < tolerance){
      reset();
   }else{
@@ -161,19 +200,37 @@ void AutonomousDrive::serializeData(){
      Serial.print(heading);
      Serial.print(" ||  Bearing: ");
      Serial.println(bearing);
-     Serial.print("DISTANCE: ");
+     Serial.print("DESTINATION DISTANCE: ");
      Serial.println(kalman.roverGPS.distance);
-     Serial.println(machine);
+     Serial.print("OBSTACLE DISTANCE: ");
      Serial.println(echosensor.distance);
      Serial.print("LOCATION: ");
      Serial.print(String(kalman.roverGPS.position.x(), 8));
-     Serial.print(" ");
+     Serial.print(",");
      Serial.println(String(kalman.roverGPS.position.y(), 8));
      Serial.print("DESTINATION: ");
      Serial.print(String(kalman.roverGPS.destination.x(), 8));
-     Serial.print(" ");
+     Serial.print(",");
      Serial.println(String(kalman.roverGPS.destination.y(), 8));
-     Serial.print("GPS RAW: ");
-     Serial.print(String(kalman.roverGPS.gps.latitudeDegrees, 8));
-     Serial.println(String(kalman.roverGPS.gps.longitudeDegrees, 8));
+
+          Serial.print("CURRENT STATE: ");
+       switch(machine){
+
+        case BACKUP:
+        Serial.println("BACKING UP");
+        break;
+        case TRACK:
+        Serial.println("GOING TOWARDS DESTINATION");
+        break;
+        case AVOID:
+        Serial.println("OBSTACLE AVOIDING!");
+        break;
+        case SUCCESS:
+        Serial.println("DESTINATION FOUND");
+        break;
+      }
+      Serial.print("Direction Wheels Turning: ");
+      Serial.println(wheelDirection);
+     Serial.println("");
 }
+

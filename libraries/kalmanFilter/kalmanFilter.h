@@ -8,9 +8,9 @@ class kalmanFilter {
 		imu::Vector<3> averageCalibration = imu::Vector<3>(0, 0, 0);
 
 		imu::Vector<2> location = imu::Vector<2>(0, 0); //The final location, when all is filtered and finished. Latitiude = x, Longitude = y.
-		double tolerance = 3.0;
-		orientation orient;
-		RoverGPS roverGPS;
+		double tolerance = 3.0; //Determines how precise acceleration calculation will be.
+		orientation orient; //Gets the IMU.
+		RoverGPS roverGPS; //Gets the GPS.
 
 		void loop();
 		void setup();
@@ -19,12 +19,13 @@ class kalmanFilter {
 		void serialize();
 		void predict();
 		bool destinationReached();
-		float destinationRadius = 10.0f; //How close until destination is conisdered reached.
+		float destinationRadius = 6.0f; //How close until destination is conisdered reached.
 		double destinations[10];
 
 
 
 
+		//Disabled Variables for future testing.
 		/*
 		//Kalman Filter variables.
 		//These variables represent various states of the kalman filter. Some may be commented out as the use case

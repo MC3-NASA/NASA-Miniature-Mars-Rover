@@ -8,6 +8,15 @@ void echo :: setup() {
 	pinMode(receivePin, INPUT);
 
 }
+
+void echo :: setup(int trig, int rec) {
+	//Inputs/Outputs
+	trigPin = trig;
+	receivePin = rec;
+	pinMode(trigPin, OUTPUT);
+	pinMode(receivePin, INPUT);
+
+}
 void echo :: loop() {
 	pulsate(length); //Give a high then low pulse to create sound.
 	duration = pulseIn(receivePin, HIGH); //reads reciever. Sends back length in microseconds.

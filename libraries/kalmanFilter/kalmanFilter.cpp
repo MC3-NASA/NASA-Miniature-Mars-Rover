@@ -1,3 +1,6 @@
+/*
+* Created by Noah Williams.
+*/
 #include "kalmanFilter.h"
 
 void kalmanFilter::setup() {
@@ -12,6 +15,9 @@ void kalmanFilter::setup() {
 
   	}
 	calibrate();
+
+
+	//Disabled features for future testing.
 	/*
 	Q.vector_to_row(imu::Vector<2>(averageCalibration.y(), 0),0);
 	Q.vector_to_row(imu::Vector<2>(0, averageCalibration.y()),1);
@@ -42,7 +48,6 @@ void kalmanFilter::setup() {
 
 void kalmanFilter::loop() {
 	orient.loop();
-	//roverGPS.loop();
 	roverGPS.updateDistanceBearing(roverGPS.position, roverGPS.destination);
 }
 
