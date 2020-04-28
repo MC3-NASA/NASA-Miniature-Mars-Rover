@@ -10,18 +10,12 @@ RoverGPS gps;
  * 
  * It's best practice to use Google Maps and click "What's here" as an example: 40.091524, -75.165870.
  */
-
-
-int detectionRange = 40; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
-
-
 //Set destinations in here!
 void SetYourDestinationsHere(){
 
 //Paste your destinations in here. Examples:
 
-    //gps.setDestinations(40.176001, -75.274005, 0); //Goes to Montgomery County Community College.
-    gps.setDestinations(0, -1, 0); //Goes to Montgomery County Community College.
+  gps.setDestinations(40.176001, -75.274005, 0); //Goes to Montgomery County Community College.
   /*
    * gps.setDestinations(42.176001, -72.274005, 1);
    * gps.setDestinations(44.176001, -71.274005, 2);
@@ -32,16 +26,42 @@ void SetYourDestinationsHere(){
 }
 
 
+//THESE VARIABLES ARE TO BE CHANGED BY USER.
+int detectionRange = 40; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+float accuracyRadius = 5; //How close to destination before succeeding. IN METERS. 
+
+//Changes the pins of the ultrasound:
+int LeftTrigPin = 7;
+int LeftRecievePin = 8;
+int RightTrigPin = 9;
+int RightRecievePin = 10;
+
+bool ObjectDetectionEnabled = false; //Turns on or off obstacle avoidance. Note: TURN OFF IF NO ULTRASOUND IS CONNECTED.
+
+bool SDRecordingEnabled = true; //Turns on or off SD card recordings. NOTE: you need an SD card, otherwise turn it off!
+
+bool SerializeDataEnabled = true; //Turns on or off data in the serial monitor. Note: turning off will improve performance. THIS NEEDS TO BE ON FOR SD CARD RECORDINGS.
+
+
 
 //DO NOT TOUCH BELOW!!!!!
 
 
 void setup() {
+  autoDrive.objectDetection = ObjectDetectionEnabled;
+  autoDrive.LeftTrigPin = LeftTrigPin;
+  autoDrive.LeftRecievePin = LeftRecievePin;
+  autoDrive.RightTrigPin = RightTrigPin;
+  autoDrive.RightRecievePin = RightRecievePin;
   autoDrive.setup(true);
   autoDrive.detectionRange = detectionRange;
   gps = autoDrive.kalman.roverGPS;
   SetYourDestinationsHere();
   autoDrive.kalman.roverGPS.traverseDestination();
+  autoDrive.kalman.destinationRadius = accuracyRadius;
+
+  autoDrive.SDRecord = SDRecordingEnabled;
+  autoDrive.SerializeDataEnabled = SerializeDataEnabled;
 }
 
 void loop() {

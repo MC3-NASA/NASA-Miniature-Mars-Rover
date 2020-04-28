@@ -6,6 +6,8 @@ void echo :: setup() {
 	//Inputs/Outputs
 	pinMode(trigPin, OUTPUT);
 	pinMode(receivePin, INPUT);
+	recieveCoro.setup(length*2);
+	pulseCoro.setup(length);
 
 }
 
@@ -18,27 +20,30 @@ void echo :: setup(int trig, int rec) {
 
 }
 void echo :: loop() {
+	pulseCoro.loop();
+	recieveCoro.loop();
 	pulsate(length); //Give a high then low pulse to create sound.
-	duration = pulseIn(receivePin, HIGH); //reads reciever. Sends back length in microseconds.
 	pinMode(receivePin, INPUT);
 	//Converts speed to distance
 	distance = (duration*0.5f)*0.0343642611683849f; //Approximate value for speed of sound.
-	if(sampleIndex >= sampleLength){
-		sampleIndex = 0;
-		float sampleAvg = 0;
-		for(int i = 0; i < sampleLength; i++){
-			sampleAvg += (duration*0.5f)*0.0343642611683849f;
-		}
-		//distance = sampleAvg/sampleLength;
-	}
-	sampleIndex++;
+	distance = constrain(distance, 0, 1000);
 }
 void echo :: pulsate(float length) {
-	digitalWrite(trigPin, LOW);
-	delayMicroseconds(length);
-	digitalWrite(trigPin, HIGH);
-	delayMicroseconds(length*2);
-	digitalWrite(trigPin, LOW);
+	if(newPulse == true)
+		digitalWrite(trigPin, LOW);
+	//delayMicroseconds(length);
+	if(pulseCoro.readyState)
+		digitalWrite(trigPin, HIGH);
+	//delayMicroseconds(length*2);
+	if(recieveCoro.readyState){
+		newPulse = true;
+		digitalWrite(trigPin, LOW);
+		duration = pulseIn(receivePin, HIGH); //reads reciever. Sends back length in microseconds.
+	}
+
+	pulseCoro.reset();
+	recieveCoro.reset();
+
 }
 String echo::serialize() {
 	return (String)"d_e"+String(distance, 6);

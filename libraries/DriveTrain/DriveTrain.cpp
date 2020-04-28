@@ -58,6 +58,20 @@ void DriveTrain::setup() {
 }
 
 void DriveTrain::forward(float speed) {
+	MainSpeed = speed;
+	if(V1+V2+V3+V4+V5+V6 < 0.1f){
+		CalculateWheelSpeed(speed, 0);
+	}
+	for(int i = 0; i < 6; i++){
+		if(wheels[i]._id == layout.leftTop) wheels[i].forward(V1);
+		if(wheels[i]._id == layout.leftMid) wheels[i].forward(V2);
+		if(wheels[i]._id == layout.leftBack) wheels[i].forward(V3);
+
+		if(wheels[i]._id == layout.rightTop) wheels[i].forward(-V4);
+		if(wheels[i]._id == layout.rightMid) wheels[i].forward(-V5);
+		if(wheels[i]._id == layout.rightBack) wheels[i].forward(-V6);
+	}
+	/*
 	for(int i = 0; i < 6; i++) {
 		
 		#ifdef DEBUG
@@ -73,9 +87,11 @@ void DriveTrain::forward(float speed) {
 			wheels[i].forward(-speed);
 		}
 	}
+	*/
 }
 
 void DriveTrain::backward(float speed) {
+	MainSpeed = speed;
 	for(int i = 0; i < 6; i++) {
 		if(wheels[i]._msState == MOTORL) {
 			
@@ -93,7 +109,9 @@ void DriveTrain::backward(float speed) {
 	}
 }
 
+
 void DriveTrain::turn(float angle, byte motors) {
+	CalculateWheelSpeed(MainSpeed, angle);
 	for(int i = 6; i < 10; i++) {
 		
 		#ifdef DEBUG
@@ -114,6 +132,7 @@ void DriveTrain::turn(float angle, byte motors) {
 }
 
 void DriveTrain::turn(float angle, int speed, byte motors) {
+	CalculateWheelSpeed(MainSpeed, angle);
   /*int negativeOne = 1;
   if(angle < 0)                               negativeOne = -1;
   if(angle > 0)                               negativeOne = 1;
@@ -179,6 +198,8 @@ void DriveTrain::turn(float angle, int speed, byte motors) {
 
 
 void DriveTrain::spin(float speed) {
+	MainSpeed = speed;
+	CalculateWheelSpeed(MainSpeed, 90);
 	for(int i = 6; i < 10; i++) {
 		
 		#ifdef DEBUG
@@ -196,9 +217,10 @@ void DriveTrain::spin(float speed) {
 			else									wheels[i].turn(70);
 		}
 	}
+	forward(speed);
+	//float differential = (speed > 0) ? 10 : -10;
 	
-	float differential = (speed > 0) ? 10 : -10;
-	
+	/*
 	for(int i = 0; i < 6; i++) {
 		#ifdef DEBUG
 			Serial.println("Forward Turning");
@@ -215,6 +237,7 @@ void DriveTrain::spin(float speed) {
 			else									wheels[i].forward(speed + -differential);
 		}
 	}
+	*/
 }
 
 void DriveTrain::stop() {
@@ -230,3 +253,95 @@ void DriveTrain::stop() {
 		}
 	}
 }
+
+void DriveTrain::CalculateWheelSpeed(float speed, float direction){
+	    if(abs(direction) > 0){
+			float turningRadius = 250-abs(((float)direction / 100) * 250);
+			turningRadius = constrain(turningRadius, 20, 250);
+			V1 = abs(speed * (sqrt(d3 * d3 + pow((d1 + turningRadius), 2))) / (turningRadius + d4) );
+			V2 = abs(speed);
+			V3 = abs(speed * (sqrt(d2 * d2 + pow((d1 + turningRadius), 2))) / (turningRadius + d4));
+
+			V4 = abs(speed * (sqrt(d3 * d3 + pow((turningRadius - d1), 2))) / (turningRadius + d4));
+			V5 = abs(speed * (turningRadius-d4)/(turningRadius+d4));
+			V6 = abs((speed * (sqrt(d2 * d2 + pow((turningRadius - d1), 2))) / (turningRadius + d4) ));
+
+			V1 = constrain(V1, 0, 100);
+			V2 = constrain(V2, 0, 100);
+			V3 = constrain(V3, 0, 100);
+			V4 = constrain(V4, 0, 100);
+			V5 = constrain(V5, 0, 100);
+			V6 = constrain(V6, 0, 100);
+		}else{
+			V1 = speed;
+			V2 = speed;
+			V3 = speed;
+			V4 = speed;
+			V5 = speed;
+			V6 = speed;
+		}
+
+}
+
+bool DriveTrain::zeroRadiusTurn(float desiredAngle, orientation orient){
+
+	float speed = 50;
+	float tolerance = 10; // degrees
+	orient.computeAngle();
+	
+	if(desiredAngle > 0) {
+	
+		if(!goalAttemptingSpin) {
+			spining = true;
+			goalAttemptingSpin = true;
+			// set the goal
+			if((desiredAngle + abs(orient.orientationG.x())) > 360) {
+				angleGoal = (desiredAngle + abs(orient.orientationG.x())) - 360;
+			}else {
+				angleGoal = abs(orient.orientationG.x()) + desiredAngle;
+			}
+		}
+		
+		if(spining) {
+			currentAngle = abs(orient.orientationG.x());
+			spin(speed);
+			
+			
+			if(abs(currentAngle - angleGoal) < tolerance) {
+				goalReachedSpin = true;
+				spining = false;
+				goalAttemptingSpin = false;
+				stop();
+			}
+		}
+	}else {
+		
+		if(!goalAttemptingSpin) {
+			
+			
+			// set the goal
+			if((desiredAngle + abs(orient.orientationG.x())) < 0) {
+				angleGoal = (desiredAngle + abs(orient.orientationG.x())) + 360;
+			}else {
+				angleGoal = abs(orient.orientationG.x()) + desiredAngle;
+			}
+		}
+		if(spining) {
+			currentAngle = abs(orient.orientationG.x());
+			spin(-speed);
+			
+			Serial.println("angle goal");
+			Serial.println(angleGoal);
+			
+			if(abs(currentAngle - angleGoal) < tolerance) {
+				goalReachedSpin = true;
+				spining = false;
+				goalAttemptingSpin = false;
+				stop();
+			}
+		}
+	}
+
+	return goalReachedSpin;
+}
+

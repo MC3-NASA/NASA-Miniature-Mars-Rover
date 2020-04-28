@@ -60,6 +60,10 @@ void save :: closeFile() {
 
 }
 
+void save :: removeFile(char *str) {
+	SD.remove(str);
+
+}
 void save :: openFile(char *str) {
 	// re-open the file for reading:
 	file = SD.open(str);

@@ -204,7 +204,7 @@ void orientation::applyForwardsForce(double f){
 	imu::Vector<3> forwards = imu::Vector<3>(0, 1, 0); //The forwards vector, representing the Y plane going forward.
 	forwardsVector = quaternion.rotateVector(forwards);//Performs the hamilton product using cross products.
 
-	position = position+(forwardsVector*f);
+	position = position+(forwardsVector*f) *0.15f;
 	distanceTraveled = sqrt(position.x()*position.x() + position.y()*position.y());
 }
 
@@ -214,6 +214,12 @@ void orientation::IIRFilter(double x, double y, double z) {
 	xf = k * xf + (1.0 - k) * x;
 	yf = k * yf + (1.0 - k) * y;
 	zf = k * zf + (1.0 - k) * z;
+}
+
+void orientation::resetPositions(){
+	position.x() = 0;
+	position.y() = 0;
+	position.z() = 0;
 }
 
 String orientation::serialize() {

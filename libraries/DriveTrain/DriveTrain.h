@@ -2,6 +2,7 @@
 #define _DriveTrain_h
 
 #include "Drive.h"
+#include <orientation.h>
 
 struct DriveTrainLayout {
 	union {
@@ -42,6 +43,7 @@ class DriveTrain {
 	DriveTrain() {}
 	DriveTrainLayout layout;;
 	Wheel wheels[10];
+	
 	void setup();							// Setup the layout and the wheels
 	void forward(float);					// Forward for all driving motors
 	void backward(float);					// similar to forward but reverse(technically not nessarcy but separate implementation for naming purpose)
@@ -49,6 +51,29 @@ class DriveTrain {
 	void stop();							// Stops all motors and all servo are set to angle zero
 	void turn(float, byte); 					// turn a specified angle for all turning motors
 	void turn(float, int, byte);
+	void CalculateWheelSpeed(float speed, float turningRadius);
+	bool zeroRadiusTurn(float angle, orientation orient); //Turns to a specified angle using the gyroscope.
+
+	float d1 = 7.254f; //inches. Horizontal distance between middle rover and corner wheels.
+    float d2 = 10.5f; //Verticle distance middle rover and corner wheels.
+    float d3 = 10.5f; //Verticle rover front wheels
+    float d4 = 10.073f; //Horizontal distance center wheels.
+
+	float V1 = 0; //Speed of front left wheel.
+    float V2 = 0; //Speed of middle left  wheel.
+    float V3 = 0; //Speed of bottom left wheel.
+
+    float V4 = 0; //Speed of front right wheel.
+    float V5 = 0; //Speed of middle right wheel.
+    float V6 = 0; //Speed of bottom right wheel.
+	float MainSpeed = 0;
+	float minimumRadius = 20;
+
+	bool goalReachedSpin=false, goalAttemptingSpin=false;
+	float currentAngle;
+	float angleGoal;
+	bool spining=false;
+	
 };
 
 

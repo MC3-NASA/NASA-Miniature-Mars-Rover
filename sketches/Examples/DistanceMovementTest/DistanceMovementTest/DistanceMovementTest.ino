@@ -23,6 +23,7 @@ void loop() {
   if(serialCoroutine.readyState){
     kalman.orient.serialize();
     serialCoroutine.reset();
+    Serial.println(kalman.orient.distanceTraveled);
   }
   reset();
   
@@ -30,8 +31,11 @@ void loop() {
   //Rightspin();
   delay(10);
 
-  if(kalman.orient.position.y() > 1.5){
+  if(kalman.orient.distanceTraveled > 1.5){
     forwards(0);
+    Serial.println("Point Reached");
+    Serial.println(kalman.orient.distanceTraveled);
+    kalman.orient.resetPositions();
     reset();
   }else{
       forwards(90);
@@ -39,57 +43,13 @@ void loop() {
 }
 
 void forwards(int speed) {
-  // left side
-  drive.spinAt(25, speed);
-  drive.spinAt(21, speed);
-  drive.spinAt(20, speed);
-
-  // right side
-  drive.spinAt(27, -speed);
-  drive.spinAt(22, -speed);
-  drive.spinAt(28, -speed);
+  drive.forward(speed);
 }
 
-void Rightspin() {
-
-  // Front
-  drive.moveTo(23, 50);
-  drive.moveTo(29, 50);
-
-  // Back
-  drive.moveTo(24, -50);
-  drive.moveTo(26, -50);
-}
-
-void Leftspin() {
-
-  // Front
-  drive.moveTo(23, -50);
-  drive.moveTo(29, -50);
-
-  // Back
-  drive.moveTo(24, 50);
-  drive.moveTo(26, 50);
+void spin(int r, int motors) {
+  drive.turn(r, motors);
 }
 
 void reset() {
-  /* Turn right */
-  // front
-  drive.moveTo(23, 0);
-  drive.moveTo(29, 0);
-
-  // back
-  drive.moveTo(24, 0);
-  drive.moveTo(26, 0);
-
-  if(driveCoroutine.readyState){
-      /* Turn Left */
-    // front
-    drive.moveTo(23, 0);
-    drive.moveTo(29, 0);
-  
-    // back
-    drive.moveTo(24, 0);
-    drive.moveTo(26, 0);
-  }
+  drive.stop();
 }

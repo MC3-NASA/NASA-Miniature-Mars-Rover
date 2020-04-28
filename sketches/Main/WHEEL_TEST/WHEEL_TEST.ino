@@ -7,7 +7,6 @@
  */
 #include <DriveTrain.h> //Deals with spinning the wheels of the rover.
 DriveTrain drive;
-
 /*
  * VARIABLES YOU CAN CHANGE!!!!!!
  * 
@@ -16,10 +15,10 @@ DriveTrain drive;
 int SPEED = 30; //SET THIS TO 0 TO TEST STRAIGHT WHEELS!!!
 
 
+
 void setup() {
   // put your setup code here, to run once:
   drive.setup();
-
 }
 
 void loop() {
@@ -27,13 +26,20 @@ void loop() {
   reset();
   if(SPEED > 0){
       forwards(30);
-      delay(1000);
+      delay(100);
+      serializeData(0);
+      delay(5000);
       forwards(-30);
-      delay(1000);
-      forwards(30);
+      serializeData(0);
+      delay(5000);
+      forwards(40);
       spin(80, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
-      delay(1000);
+      serializeData(80);
+      delay(5000);
       spin(-80, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
+      serializeData(-80);
+      delay(5000);
+      
   }
 
 
@@ -51,4 +57,11 @@ void spin(int r, int motors) {
 
 void reset() {
   spin(0, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
+}
+
+void serializeData(int angle){
+  Serial.print("Turning this angle: ");
+  Serial.println(angle);
+  String str = "V1: "+String(drive.V1) + " | | V2: "+String(drive.V2) + " | | V3: "+String(drive.V3) + " | | V4: "+String(drive.V4) + " | | V5: "+String(drive.V5) + " | | V6: "+String(drive.V6);
+  Serial.println(str);
 }

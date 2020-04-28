@@ -12,10 +12,18 @@
 /*
  * LIST OF VARIABLES THAT CAN BE CHANGED:
  */
- int detectionRange = 50; //Centimeters, CHANGES HOW FAR ULTRASOUND DETECTS OBSTACLE
 
+//THESE VARIABLES ARE TO BE CHANGED BY USER.
+int detectionRange = 40; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+float accuracyRadius = 5; //How close to destination before succeeding. IN METERS. 
 
+//Changes the pins of the ultrasound:
+int LeftTrigPin = 7;
+int LeftRecievePin = 8;
+int RightTrigPin = 9;
+int RightRecievePin = 10;
 
+bool ObjectDetectionEnabled = true; //Turns on or off obstacle avoidance.
 
 
 
@@ -73,6 +81,12 @@ void setupAutoDrive(){
   }
 
   autoDrive.detectionRange = detectionRange;
+    autoDrive.objectDetection = ObjectDetectionEnabled;
+  autoDrive.LeftTrigPin = LeftTrigPin;
+  autoDrive.LeftRecievePin = LeftRecievePin;
+  autoDrive.RightTrigPin = RightTrigPin;
+  autoDrive.RightRecievePin = RightRecievePin;
+   autoDrive.kalman.destinationRadius = accuracyRadius;
   autoDrive.setup();
 }
 

@@ -29,7 +29,7 @@ public:
 	double filterStrength = 6.25; //Filter calibration Strength.
 	double xf, yf, zf;
 	float ax, ay, az;
-	float tolerance = 0.3; //Tolerance value for accelerometer sensitivity.
+	float tolerance = 0.4; //Tolerance value for accelerometer sensitivity.
 
 	float wheelRadius = 0.0593; //Approximate value of the wheels radius.
 	float estimatedSpeed = 0.3; //Rough estimation of the max possible speed given the rate at which the wheels are turning.
@@ -49,4 +49,5 @@ public:
 	void computeAngle();
 	float distanceTraveled = 0.0f; //Meters
 	String serialize();
+	void resetPositions();
 };

@@ -2,6 +2,7 @@
 //Created by Noah Williams on 9/7/2019.
 //Echo location functions used for finding objects via sound.
 #include <Arduino.h>
+#include <coroutine.h>
 using namespace std;
 class echo {
 public:
@@ -17,5 +18,9 @@ public:
 	void loop();
 	void pulsate(float speed);
 	String serialize();
+	coroutine pulseCoro;
+    coroutine recieveCoro;
+	bool newPulse = true;
+
 };
 

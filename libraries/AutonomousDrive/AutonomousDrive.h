@@ -1,7 +1,9 @@
+#pragma once
 #include <DriveTrain.h> //Deals with spinning the wheels of the rover.
 #include <kalmanFilter.h> //Gets IMU device for the rover
 #include "coroutine.h"
 #include <echo.h>
+#include <save.h>
 class AutonomousDrive {
 	public:
         kalmanFilter kalman; //A common library for IMU devices.
@@ -10,16 +12,24 @@ class AutonomousDrive {
         coroutine kalmanCoroutine;
         coroutine avoid;
         coroutine printData;
+        coroutine saveData;
 
         enum Rover {
         TRACK,
         BACKUP,
         AVOID,
         SUCCESS,
+        TURNINPLACE,
         };
 
         Rover machine;
-        echo echosensor;
+        echo echosensorRight;
+        echo echosensorLeft;
+        save saveSD;
+        int LeftTrigPin = 7;
+        int LeftRecievePin = 8;
+        int RightTrigPin = 9;
+        int RightRecievePin = 10;
 
         double tolerance = kalman.tolerance;//Let's play with different values.
         double heading = kalman.orient.heading; //Kalman filters it for you.
@@ -27,6 +37,9 @@ class AutonomousDrive {
         double difference = abs(heading-bearing);
         int wheelDirection = 0;
         int detectionRange = 50; //Centimeters
+        bool objectDetection = true;
+        bool SDRecord = true;
+        bool SerializeDataEnabled = true;
 
         void setup();
         void setup(bool isManual);
@@ -40,4 +53,6 @@ class AutonomousDrive {
         void reset();
         void haltRover();
         void serializeData();
+        bool driveToMeter(float meter);
+        void turnInPlace();
 };

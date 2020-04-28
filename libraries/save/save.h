@@ -15,6 +15,7 @@ public:
 	void saveToFileln(char*str);
 	void saveToFile(float);
 	void saveToFileln(float);
+	void removeFile(char*str);
 	void loadMap(char *str, char roverMap[64][64], float*lat, float*lon, int*zoom);
 	int processString(String procString, float *value, int indexS);
 };
