@@ -30,7 +30,11 @@ void echo :: loop() {
 }
 void echo :: pulsate(float length) {
 	if(newPulse == true)
+	{
 		digitalWrite(trigPin, LOW);
+		newPulse = false;
+	}
+
 	//delayMicroseconds(length);
 	if(pulseCoro.readyState)
 		digitalWrite(trigPin, HIGH);

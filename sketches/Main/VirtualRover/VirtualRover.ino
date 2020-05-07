@@ -26,6 +26,10 @@ int RightRecievePin = 10;
 bool ObjectDetectionEnabled = true; //Turns on or off obstacle avoidance.
 
 
+bool SDRecordingEnabled = false; //Turns on or off SD card recordings. NOTE: you need an SD card, otherwise turn it off!
+
+bool SerializeDataEnabled = false; //Turns on or off data in the serial monitor. Note: turning off will improve performance. THIS NEEDS TO BE ON FOR SD CARD RECORDINGS.
+
 
 //Do not touch below
 AutonomousDrive autoDrive;
@@ -87,6 +91,10 @@ void setupAutoDrive(){
   autoDrive.RightTrigPin = RightTrigPin;
   autoDrive.RightRecievePin = RightRecievePin;
    autoDrive.kalman.destinationRadius = accuracyRadius;
+
+   
+  autoDrive.SDRecord = SDRecordingEnabled;
+  autoDrive.SerializeDataEnabled = SerializeDataEnabled;
   autoDrive.setup();
 }
 
