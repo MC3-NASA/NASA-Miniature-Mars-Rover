@@ -34,11 +34,8 @@ void echo :: pulsate(float length) {
 		digitalWrite(trigPin, LOW);
 		newPulse = false;
 	}
-
-	//delayMicroseconds(length);
 	if(pulseCoro.readyState)
 		digitalWrite(trigPin, HIGH);
-	//delayMicroseconds(length*2);
 	if(recieveCoro.readyState){
 		newPulse = true;
 		digitalWrite(trigPin, LOW);

@@ -5,8 +5,8 @@ void setup() {
 
   ///YOU CAN CHANGE THE UPDATE RATE HERE:
   //NOTE, IT SHOULD STILL PRINT RAPIDLY, BUT ONLY UPDATE ACCORDING TO THIS NUMBER. MILLISECONDS:
-  echo1.length = 10000;
-  echo2.length = 10000;
+  echo1.length = 10;
+  echo2.length = 10;
 
   ////////////
   echo2.trigPin = 9;
