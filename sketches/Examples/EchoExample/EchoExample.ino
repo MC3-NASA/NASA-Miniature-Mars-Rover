@@ -2,8 +2,14 @@
 echo echo1;
 echo echo2;
 void setup() {
-  // put your setup code here, to run once:
-    echo2.trigPin = 9;
+
+  ///YOU CAN CHANGE THE UPDATE RATE HERE:
+  //NOTE, IT SHOULD STILL PRINT RAPIDLY, BUT ONLY UPDATE ACCORDING TO THIS NUMBER. MILLISECONDS:
+  echo1.length = 10000;
+  echo2.length = 10000;
+
+  ////////////
+  echo2.trigPin = 9;
   echo2.receivePin = 10;
   echo1.setup();
   echo2.setup();
