@@ -5,12 +5,12 @@ void setup() {
 
   ///YOU CAN CHANGE THE UPDATE RATE HERE:
   //NOTE, IT SHOULD STILL PRINT RAPIDLY, BUT ONLY UPDATE ACCORDING TO THIS NUMBER. MILLISECONDS:
-  echo1.length = 10;
-  echo2.length = 10;
+  echo1.length = 100;
+  echo2.length = 100;
 
   ////////////
-  echo2.trigPin = 9;
-  echo2.receivePin = 10;
+  echo2.trigPin = 4;
+  echo2.receivePin = 3;
   echo1.setup();
   echo2.setup();
   Serial.begin(9600);
