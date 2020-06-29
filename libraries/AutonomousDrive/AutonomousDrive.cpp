@@ -3,7 +3,8 @@
  */
 #include "AutonomousDrive.h"
 void AutonomousDrive::setup() {
-  // put your setup code here, to run once: 
+  // put your setup code here, to run once:
+  machine = TRACK;
   kalmanCoroutine.setup(10);
   driveCoroutine.setup(1000);
   printData.setup(1500);
@@ -11,8 +12,8 @@ void AutonomousDrive::setup() {
   saveData.setup(60000);
   drive.setup();
   kalman.setup();
-  if(SDRecord)
-    saveSD.setup();
+  //if(SDRecord)
+    //saveSD.setup();
   echosensorLeft.trigPin = LeftTrigPin;
   echosensorLeft.receivePin = LeftRecievePin;
   echosensorRight.trigPin = RightTrigPin;
@@ -20,8 +21,8 @@ void AutonomousDrive::setup() {
 
   echosensorRight.setup();
   echosensorLeft.setup();
-  SD.remove("RTD.txt");
-  saveSD.writeFile("RTD.txt");
+  //SD.remove("RTD.txt");
+  //saveSD.writeFile("RTD.txt");
   reset();
   forwards(0);
   calibrate();
@@ -40,23 +41,23 @@ void AutonomousDrive::setup(bool IsManual) {
   saveData.setup(60000);
   drive.setup();
   kalman.setup();
-  if(SDRecord)
-    saveSD.setup();
+  //if(SDRecord)
+   // saveSD.setup();
   echosensorLeft.trigPin = LeftTrigPin;
   echosensorLeft.receivePin = LeftRecievePin;
   echosensorRight.trigPin = RightTrigPin;
   echosensorRight.receivePin = RightRecievePin;
   echosensorRight.setup();
   echosensorLeft.setup();
-  SD.remove("RTD.txt");
-  saveSD.writeFile("RTD.txt");
+  //SD.remove("RTD.txt");
+  //saveSD.writeFile("RTD.txt");
   reset();
   forwards(0);
   calibrate();
 }
 
 void AutonomousDrive::calibrate(){
-  forwards(25);
+  forwards(50);
   uint8_t system, gyro, accel, mag = 0;
   while (system != 3)
   {
@@ -76,7 +77,7 @@ void AutonomousDrive::calibrate(){
   reset();
   forwards(0);
   Serial.println(""); Serial.println("Calibration Done. Please place Rover down.");
-  delay(5000);
+  delay(10000);
 }
 
 void AutonomousDrive::loop() {
@@ -84,13 +85,14 @@ void AutonomousDrive::loop() {
  kalmanCoroutine.loop();
  driveCoroutine.loop();
  avoid.loop();
- saveData.loop();
+ //saveData.loop();
  printData.loop();
  kalman.roverGPS.loop();
  if(kalmanCoroutine.readyState){
     kalmanCoroutine.reset();
    kalman.loop();
 
+    //Updates the ultrasound if object detection enabled.
     if(objectDetection){
          echosensorRight.loop();
          echosensorLeft.loop();
@@ -113,8 +115,14 @@ void AutonomousDrive::loop() {
     }
   }
 
+  //Checks if an object is close, if object detection enabled.
   if(objectDetection){
-    if(echosensorLeft.distance <= detectionRange || echosensorRight.distance <= detectionRange){
+    //The ultrasonic sensors cannot detect 0 cm. After a certain distance, it will reset to 1000.
+    //Ultrasounds at 0 indicates startup.
+    if ((echosensorLeft.distance > 0.5f && echosensorLeft.distance <= detectionRange) 
+    || (echosensorRight.distance > 0.5f && echosensorRight.distance <= detectionRange+60))
+    
+    {
       machine = BACKUP;
     }
   }
@@ -142,6 +150,7 @@ void AutonomousDrive::loop() {
  driveCoroutine.reset();
  avoid.reset();
  printData.reset();
+ /*
 if(SDRecord){
  if(saveData.readyState){
    saveSD.closeFile();
@@ -150,13 +159,14 @@ if(SDRecord){
  }
     saveData.reset();
 }
+*/
 
 }
 
 void AutonomousDrive::backup(){
   reset();
   forwards(-80);
-  if(driveToMeter(4)){
+  if(driveToMeter(backupMeters)){
     machine = TURNINPLACE;
     avoid.reset();
   }
@@ -172,7 +182,7 @@ void AutonomousDrive::turnInPlace(){
 
 void AutonomousDrive::avoidObstacle(){
 
-  if(driveToMeter(6)){
+  if(driveToMeter(2)){
     machine = TRACK;
     avoid.reset();
   }

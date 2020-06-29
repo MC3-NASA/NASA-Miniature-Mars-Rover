@@ -205,7 +205,7 @@ void orientation::applyForwardsForce(double f){
 	forwardsVector = quaternion.rotateVector(forwards);//Performs the hamilton product using cross products.
 
 	position = position+(forwardsVector*f) *0.15f;
-	distanceTraveled = sqrt(position.x()*position.x() + position.y()*position.y());
+	distanceTraveled = sqrt(position.x() * position.x() + position.z() * position.z() + position.y() * position.y());
 }
 
 //Infinite Impulse Response

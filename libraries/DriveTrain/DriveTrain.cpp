@@ -62,6 +62,14 @@ void DriveTrain::forward(float speed) {
 	if(V1+V2+V3+V4+V5+V6 < 0.1f){
 		CalculateWheelSpeed(speed, 0);
 	}
+	if(abs(speed) < 1){
+		V1 = 0;
+		V2 = 0;
+		V3 = 0;
+		V4 = 0;
+		V5 = 0;
+		V6 = 0;
+	}
 	for(int i = 0; i < 6; i++){
 		if(wheels[i]._id == layout.leftTop) wheels[i].forward(V1);
 		if(wheels[i]._id == layout.leftMid) wheels[i].forward(V2);
@@ -88,6 +96,9 @@ void DriveTrain::forward(float speed) {
 		}
 	}
 	*/
+if(abs(speed) < 1){
+
+}
 }
 
 void DriveTrain::backward(float speed) {
@@ -210,10 +221,10 @@ void DriveTrain::spin(float speed) {
 		#endif
 		
 		if(wheels[i]._msState == SERVOL) {
-			if(wheels[i]._id == layout.leftBottomS)	wheels[i].turn(115);
+			if(wheels[i]._id == layout.leftBottomS)	wheels[i].turn(80);
 			else									wheels[i].turn(70);
 		}else if(wheels[i]._msState == SERVOR) {
-			if(wheels[i]._id == layout.rightTopS)	wheels[i].turn(120);
+			if(wheels[i]._id == layout.rightTopS)	wheels[i].turn(80);
 			else									wheels[i].turn(70);
 		}
 	}
@@ -285,7 +296,7 @@ void DriveTrain::CalculateWheelSpeed(float speed, float direction){
 
 bool DriveTrain::zeroRadiusTurn(float desiredAngle, orientation orient){
 
-	float speed = 50;
+	float speed = 90;
 	float tolerance = 10; // degrees
 	orient.computeAngle();
 	
