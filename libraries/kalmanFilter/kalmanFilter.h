@@ -1,3 +1,4 @@
+#pragma once
 #include "orientation.h"
 #include "RoverGPS.h"
 #include "Arduino.h"

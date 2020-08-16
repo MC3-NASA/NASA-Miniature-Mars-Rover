@@ -131,3 +131,17 @@ int save :: processString(String procString, float *value, int indexS){
 void save :: loop() {
 
 }
+
+void save :: loadCalibrationData(){
+
+}
+
+void save :: saveCalibrationData(adafruit_bno055_offsets_t &calibData)
+{
+	String str = String(calibData.accel_offset_x); 
+	int str_len = str.length() + 1;
+	char stringarray[str_len];
+	str.toCharArray(stringarray, str_len);
+	saveToFileln(stringarray);
+	closeFile();
+}

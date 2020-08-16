@@ -211,44 +211,58 @@ void DriveTrain::turn(float angle, int speed, byte motors) {
 void DriveTrain::spin(float speed) {
 	MainSpeed = speed;
 	CalculateWheelSpeed(MainSpeed, 90);
-	for(int i = 6; i < 10; i++) {
-		
-		#ifdef DEBUG
-			Serial.println("Turn");
-			Serial.print("Motor Wheel id: ");
-			Serial.println(wheels[i]._id);
-			Serial.println("");
-		#endif
-		
-		if(wheels[i]._msState == SERVOL) {
-			if(wheels[i]._id == layout.leftBottomS)	wheels[i].turn(80);
-			else									wheels[i].turn(70);
-		}else if(wheels[i]._msState == SERVOR) {
-			if(wheels[i]._id == layout.rightTopS)	wheels[i].turn(80);
-			else									wheels[i].turn(70);
+	for (int i = 6; i < 10; i++)
+	{
+
+#ifdef DEBUG
+		Serial.println("Turn");
+		Serial.print("Motor Wheel id: ");
+		Serial.println(wheels[i]._id);
+		Serial.println("");
+#endif
+
+		if (wheels[i]._msState == SERVOL)
+		{
+			if (wheels[i]._id == layout.leftBottomS)
+				wheels[i].turn(115);
+			else
+				wheels[i].turn(70);
+		}
+		else if (wheels[i]._msState == SERVOR)
+		{
+			if (wheels[i]._id == layout.rightTopS)
+				wheels[i].turn(120);
+			else
+				wheels[i].turn(70);
 		}
 	}
-	forward(speed);
-	//float differential = (speed > 0) ? 10 : -10;
-	
-	/*
-	for(int i = 0; i < 6; i++) {
-		#ifdef DEBUG
-			Serial.println("Forward Turning");
-			Serial.print("Motor Wheel id: ");
-			Serial.println(wheels[i]._id);
-			Serial.println("");
-		#endif
-		
-		if(wheels[i]._msState == MOTORL) {
-			if(wheels[i]._id == layout.leftBack)	wheels[i].forward(-speed + differential);
-			else									wheels[i].forward(speed + differential);
-		}else if(wheels[i]._msState == MOTORR) {
-			if(wheels[i]._id == layout.rightTop)	wheels[i].forward(-speed + -differential);
-			else									wheels[i].forward(speed + -differential);
+
+	float differential = (speed > 0) ? 10 : -10;
+
+	for (int i = 0; i < 6; i++)
+	{
+#ifdef DEBUG
+		Serial.println("Forward Turning");
+		Serial.print("Motor Wheel id: ");
+		Serial.println(wheels[i]._id);
+		Serial.println("");
+#endif
+
+		if (wheels[i]._msState == MOTORL)
+		{
+			if (wheels[i]._id == layout.leftBack)
+				wheels[i].forward(-speed + differential);
+			else
+				wheels[i].forward(speed + differential);
+		}
+		else if (wheels[i]._msState == MOTORR)
+		{
+			if (wheels[i]._id == layout.rightTop)
+				wheels[i].forward(-speed + -differential);
+			else
+				wheels[i].forward(speed + -differential);
 		}
 	}
-	*/
 }
 
 void DriveTrain::stop() {
