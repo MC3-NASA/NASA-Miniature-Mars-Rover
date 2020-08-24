@@ -134,14 +134,46 @@ void save :: loop() {
 
 void save :: loadCalibrationData(){
 
+	
+
 }
 
 void save :: saveCalibrationData(adafruit_bno055_offsets_t &calibData)
 {
-	String str = String(calibData.accel_offset_x); 
+	//Get Acceleration Offsets.
+	String str = "a[" + String(calibData.accel_offset_x) + "," + String(calibData.accel_offset_y) + "," + String(calibData.accel_offset_z)+ "]"; 
 	int str_len = str.length() + 1;
 	char stringarray[str_len];
 	str.toCharArray(stringarray, str_len);
 	saveToFileln(stringarray);
+	
+	//Get Gyro Offsets.
+	str = "g[" + String(calibData.gyro_offset_x) + "," + String(calibData.gyro_offset_y) + "," + String(calibData.gyro_offset_z)+ "]"; 
+	str_len = str.length() + 1;
+	char stringarray2[str_len];
+	str.toCharArray(stringarray2, str_len);
+	saveToFileln(stringarray2);
+
+	//Get Magnometer Offsets.
+	str = "m[" + String(calibData.mag_offset_x) + "," + String(calibData.mag_offset_y) + "," + String(calibData.mag_offset_z)+ "]"; 
+	str_len = str.length() + 1;
+	char stringarray3[str_len];
+	str.toCharArray(stringarray3, str_len);
+	saveToFileln(stringarray3);
+	
+	//Get Accel Radius Offsets.
+	str = "C[" + String(calibData.accel_radius) + "]"; 
+	str_len = str.length() + 1;
+	char stringarray4[str_len];
+	str.toCharArray(stringarray4, str_len);
+	saveToFileln(stringarray4);
+
+	//Get Mag Radius Offsets.
+	str = "R[" + String(calibData.mag_radius) + "]"; 
+	str_len = str.length() + 1;
+	char stringarray5[str_len];
+	str.toCharArray(stringarray5, str_len);
+	saveToFileln(stringarray5);
+	
 	closeFile();
 }

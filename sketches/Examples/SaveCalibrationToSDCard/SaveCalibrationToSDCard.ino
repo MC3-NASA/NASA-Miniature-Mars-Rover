@@ -10,6 +10,7 @@ void setup() {
   Serial.begin(9600);
   kalman.setup();
   calibrate();
+  save.setup();
   SD.remove("CALI.txt");
   save.writeFile("CALI.txt");
 }
