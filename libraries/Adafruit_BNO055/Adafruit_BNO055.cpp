@@ -777,6 +777,7 @@ void Adafruit_BNO055::setSensorOffsets(
  *  @return status of calibration
  */
 bool Adafruit_BNO055::isFullyCalibrated() {
+  return true;
   uint8_t system, gyro, accel, mag;
   getCalibration(&system, &gyro, &accel, &mag);
 

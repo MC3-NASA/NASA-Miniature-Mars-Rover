@@ -19,6 +19,6 @@ public:
 	void removeFile(char*str);
 	void loadMap(char *str, char roverMap[64][64], float*lat, float*lon, int*zoom);
 	int processString(String procString, float *value, int indexS);
-	void loadCalibrationData();
+	void loadCalibrationData(Adafruit_BNO055 &bno);
 	void saveCalibrationData(adafruit_bno055_offsets_t &calibData);
 };

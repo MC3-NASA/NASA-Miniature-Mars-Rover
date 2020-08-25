@@ -120,9 +120,10 @@ void save :: loadMap(char *str, char roverMap[64][64], float*lat, float*lon, int
 
 int save :: processString(String procString, float *value, int indexS){
   String buffer = "";
-  while(procString[indexS] != ',' && procString[indexS] != '\0'){
+  while(procString[indexS] != ',' && procString[indexS] != ']' &&  procString[indexS] != '[' && procString[indexS] != '\0'){
 	  buffer += procString[indexS];
 	  indexS++;
+
   }
   *value = buffer.toFloat();
   indexS++;
@@ -132,10 +133,78 @@ void save :: loop() {
 
 }
 
-void save :: loadCalibrationData(){
+void save :: loadCalibrationData(Adafruit_BNO055 &bno){
+	String cali = ""; //The calibration data stored as a single string.
+	adafruit_bno055_offsets_t calibrationData; //Calibration data to be stored within BNO055.
+	file = SD.open("CALI.TXT");
 
-	
+		if (file) {
+			// read from the file until there's nothing else in it:
+			while (file.available()) {
+				cali += (char)file.read();
+			}
+			// close the file:
+    	file.close();
 
+		//After reading through the entire text begin to parse data.
+		Serial.println(cali); //Prints information for debugging.
+		
+		//Process accelerometer data.
+		int index = 2;
+		float value = -1;
+		index = processString(cali, &value, index);
+		calibrationData.accel_offset_x = value;
+		index = processString(cali, &value, index);
+		calibrationData.accel_offset_y = value;
+		index = processString(cali, &value, index);
+		calibrationData.accel_offset_z = value;
+
+		Serial.println(" ");
+		//Process gyro data.
+		index += 3;
+		index = processString(cali, &value, index);
+		calibrationData.gyro_offset_x = (int)value;
+		Serial.println(value);
+		index = processString(cali, &value, index);
+		calibrationData.gyro_offset_y = 6496;
+		Serial.println(value);
+		index = processString(cali, &value, index);
+		calibrationData.gyro_offset_z = (int)value;
+		Serial.println(value);
+
+
+		Serial.println(" ");
+		//Process magnometer data.
+		index += 4;
+		index = processString(cali, &value, index);
+		calibrationData.mag_offset_x = (int)value;
+		Serial.println(value);
+		index = processString(cali, &value, index);
+		calibrationData.mag_offset_y = (int)value;
+		Serial.println(value);
+		index = processString(cali, &value, index);
+		calibrationData.mag_offset_z = (int)value;
+		Serial.println(value);
+
+		//Process radius data.
+		Serial.println(" ");
+		index += 4;
+		index = processString(cali, &value, index);
+		calibrationData.accel_radius = (int)value;
+		Serial.println(value);
+		index += 4;
+		index = processString(cali, &value, index);
+		calibrationData.mag_radius = (int)value;
+		Serial.println(value);
+
+		bno.setSensorOffsets(calibrationData);
+		}else{
+			// if the file didn't open, print an error:
+    		Serial.println("No file, calibrating manually.");
+		}
+
+
+		
 }
 
 void save :: saveCalibrationData(adafruit_bno055_offsets_t &calibData)

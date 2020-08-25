@@ -41,8 +41,7 @@ void AutonomousDrive::setup(bool IsManual) {
   saveData.setup(60000);
   drive.setup();
   kalman.setup();
-  //if(SDRecord)
-   // saveSD.setup();
+  saveSD.setup();
   echosensorLeft.trigPin = LeftTrigPin;
   echosensorLeft.receivePin = LeftRecievePin;
   echosensorRight.trigPin = RightTrigPin;
@@ -53,7 +52,23 @@ void AutonomousDrive::setup(bool IsManual) {
   //saveSD.writeFile("RTD.txt");
   reset();
   forwards(0);
-  calibrate();
+  
+
+  uint8_t system, gyro, accel, mag = 0;
+  kalman.orient.bno.getCalibration(&system, &gyro, &accel, &mag);
+  saveSD.loadCalibrationData(kalman.orient.bno);
+  adafruit_bno055_offsets_t caliData;
+  kalman.orient.bno.setExtCrystalUse(true);
+
+
+  	if( kalman.orient.bno.getSensorOffsets(caliData) ){
+			Serial.println("It works");
+		}else{Serial.println("No working");}
+
+
+    displaySensorOffsets(caliData);
+
+    calibrate();
 }
 
 void AutonomousDrive::calibrate(){
@@ -342,5 +357,29 @@ void AutonomousDrive::serializeData(){
      saveSD.saveToFileln(stringarray3);
      }
 
+}
+
+void AutonomousDrive::displaySensorOffsets(const adafruit_bno055_offsets_t &calibData)
+{
+    Serial.print("Accelerometer: ");
+    Serial.print(calibData.accel_offset_x); Serial.print(",");
+    Serial.print(calibData.accel_offset_y); Serial.print(",");
+    Serial.print(calibData.accel_offset_z); Serial.print(",");
+
+    Serial.print("\nGyro: ");
+    Serial.print(calibData.gyro_offset_x); Serial.print(",");
+    Serial.print(calibData.gyro_offset_y); Serial.print(",");
+    Serial.print(calibData.gyro_offset_z); Serial.print(",");
+
+    Serial.print("\nMag: ");
+    Serial.print(calibData.mag_offset_x); Serial.print(",");
+    Serial.print(calibData.mag_offset_y); Serial.print(",");
+    Serial.print(calibData.mag_offset_z); Serial.print(",");
+
+    Serial.print("\nAccel Radius: ");
+    Serial.print(calibData.accel_radius);
+
+    Serial.print("\nMag Radius: ");
+    Serial.print(calibData.mag_radius);
 }
 

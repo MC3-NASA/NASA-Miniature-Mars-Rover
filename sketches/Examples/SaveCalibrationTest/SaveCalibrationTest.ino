@@ -282,10 +282,11 @@ void loop() {
 
     /* Optional: Display calibration status */
     adafruit_bno055_offsets_t calibrationData;
-    calibrationData.accel_offset_x = 1;
-    calibrationData.accel_offset_y = 1;
-    calibrationData.accel_offset_z = 1;
+    calibrationData.gyro_offset_x = 1;
+    calibrationData.gyro_offset_y = 1;
+    calibrationData.gyro_offset_z = 1;
     bno.setSensorOffsets(calibrationData);
+    bno.getSensorOffsets(calibrationData);
     //displayCalStatus();
     displaySensorOffsets(calibrationData);
     /* Optional: Display sensor status (debug only) */
