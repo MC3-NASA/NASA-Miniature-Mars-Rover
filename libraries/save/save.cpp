@@ -152,24 +152,40 @@ void save :: loadCalibrationData(Adafruit_BNO055 &bno){
 		//Process accelerometer data.
 		int index = 2;
 		float value = -1;
+		uint8_t calibData[22];
 		index = processString(cali, &value, index);
-		calibrationData.accel_offset_x = value;
-		index = processString(cali, &value, index);
-		calibrationData.accel_offset_y = value;
-		index = processString(cali, &value, index);
-		calibrationData.accel_offset_z = value;
-
+		int16_t a = 2001;
+		uint8_t lsb = (uint8_t)(a&0x00FF);
+		uint8_t msb = (uint8_t) ((a >> 8) & 0x0FF);
+		//calibData[0] = lsb;
+		//calibData[1] = msb;
+		for(int i = 0; i < 22; i++){
+			if(i%2 == 0)
+				calibData[i] = lsb;
+			else
+				calibData[i] = msb;
+		}
+		//calibrationData.accel_offset_x = msb;
+		//Serial.println(calibrationData.accel_offset_x);
+		//index = processString(cali, &value, index);
+		//calibrationData.accel_offset_y = value;
+		//index = processString(cali, &value, index);
+		//calibrationData.accel_offset_z = value;
+		 
+		 /*
 		Serial.println(" ");
 		//Process gyro data.
 		index += 3;
+		uint16_t v = 6496;
 		index = processString(cali, &value, index);
-		calibrationData.gyro_offset_x = (int)value;
+		calibrationData.gyro_offset_x = 1001;
 		Serial.println(value);
 		index = processString(cali, &value, index);
-		calibrationData.gyro_offset_y = 6496;
+		calibrationData.gyro_offset_y = 6;
 		Serial.println(value);
 		index = processString(cali, &value, index);
-		calibrationData.gyro_offset_z = (int)value;
+
+		calibrationData.gyro_offset_z = v;
 		Serial.println(value);
 
 
@@ -196,8 +212,10 @@ void save :: loadCalibrationData(Adafruit_BNO055 &bno){
 		index = processString(cali, &value, index);
 		calibrationData.mag_radius = (int)value;
 		Serial.println(value);
-
-		bno.setSensorOffsets(calibrationData);
+*/
+		bno.setSensorOffsets(calibData);
+		Serial.println(calibData[0]);
+		Serial.println(calibData[1]);
 		}else{
 			// if the file didn't open, print an error:
     		Serial.println("No file, calibrating manually.");
@@ -245,4 +263,28 @@ void save :: saveCalibrationData(adafruit_bno055_offsets_t &calibData)
 	saveToFileln(stringarray5);
 	
 	closeFile();
+}
+
+void save:: write_STRUCT(char *filename, adafruit_bno055_offsets_t &calibrationData) {
+
+ if (SD.exists(filename)) {
+   SD.remove(filename);
+ }
+
+ File structFile = SD.open(filename, FILE_WRITE);
+ 
+ if (structFile) {
+    structFile.write((uint8_t *)&calibrationData, sizeof(calibrationData));
+ }
+
+ structFile.close();
+}
+
+
+void save:: read_STRUCT(char *filename, adafruit_bno055_offsets_t &calibrationData) {
+	
+ File structFile = SD.open(filename, FILE_READ);
+ 
+ structFile.read((uint8_t *)&calibrationData, sizeof(calibrationData)/sizeof(uint8_t));
+ structFile.close();
 }

@@ -21,4 +21,6 @@ public:
 	int processString(String procString, float *value, int indexS);
 	void loadCalibrationData(Adafruit_BNO055 &bno);
 	void saveCalibrationData(adafruit_bno055_offsets_t &calibData);
+	void write_STRUCT(char *filename, adafruit_bno055_offsets_t &calibData);
+	void read_STRUCT(char *filename, adafruit_bno055_offsets_t &calibData); 
 };

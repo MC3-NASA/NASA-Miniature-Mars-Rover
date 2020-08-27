@@ -12,8 +12,13 @@ void AutonomousDrive::setup() {
   saveData.setup(60000);
   drive.setup();
   kalman.setup();
-  //if(SDRecord)
-    //saveSD.setup();
+  saveSD.setup();
+
+  if(SDRecord){
+      SD.remove("RTD.txt");
+     saveSD.writeFile("RTD.txt");
+  }
+
   echosensorLeft.trigPin = LeftTrigPin;
   echosensorLeft.receivePin = LeftRecievePin;
   echosensorRight.trigPin = RightTrigPin;
@@ -21,14 +26,10 @@ void AutonomousDrive::setup() {
 
   echosensorRight.setup();
   echosensorLeft.setup();
-  //SD.remove("RTD.txt");
-  //saveSD.writeFile("RTD.txt");
+
   reset();
   forwards(0);
   calibrate();
-  //kalman.roverGPS.setDestinations(40.176001, -75.274005, 0); //First tree south tree.
-  //kalman.roverGPS.setDestinations(40.176103, -75.273777, 1); //Second east tree.
-  //kalman.roverGPS.setDestinations(40.176275, -75.274011, 2); //Third starting point.
   kalman.roverGPS.traverseDestination();
 }
 
@@ -48,34 +49,26 @@ void AutonomousDrive::setup(bool IsManual) {
   echosensorRight.receivePin = RightRecievePin;
   echosensorRight.setup();
   echosensorLeft.setup();
-  //SD.remove("RTD.txt");
-  //saveSD.writeFile("RTD.txt");
+  if(SDRecord){
+      SD.remove("RTD.txt");
+     saveSD.writeFile("RTD.txt");
+  }
   reset();
   forwards(0);
-  
-
-  uint8_t system, gyro, accel, mag = 0;
-  kalman.orient.bno.getCalibration(&system, &gyro, &accel, &mag);
-  saveSD.loadCalibrationData(kalman.orient.bno);
-  adafruit_bno055_offsets_t caliData;
-  kalman.orient.bno.setExtCrystalUse(true);
-
-
-  	if( kalman.orient.bno.getSensorOffsets(caliData) ){
-			Serial.println("It works");
-		}else{Serial.println("No working");}
-
-
-    displaySensorOffsets(caliData);
-
-    calibrate();
+  calibrate();
+  kalman.roverGPS.traverseDestination();
 }
 
 void AutonomousDrive::calibrate(){
   forwards(50);
+  adafruit_bno055_offsets_t calibrationData;
   uint8_t system, gyro, accel, mag = 0;
-  while (system != 3)
+  while (system < 2 || gyro < 2 || mag < 3|| accel < 2)
   {
+
+    saveSD.read_STRUCT("CALL", calibrationData);
+    kalman.orient.bno.setSensorOffsets(calibrationData);
+
     kalman.orient.bno.getCalibration(&system, &gyro, &accel, &mag);
     Serial.print("CALIBRATING PLEASE SPIN AROUND!   sys=");
     Serial.print(system, DEC);
@@ -91,20 +84,49 @@ void AutonomousDrive::calibrate(){
 
   reset();
   forwards(0);
+
   Serial.println(""); Serial.println("Calibration Done. Please place Rover down.");
+  saveSD.write_STRUCT("CALL", calibrationData);
   delay(10000);
+  kalman.orient.bno.setExtCrystalUse(true);
 }
 
 void AutonomousDrive::loop() {
   // put your main code here, to run repeatedly:
+  
+  //Updates all the coratines.
  kalmanCoroutine.loop();
  driveCoroutine.loop();
  avoid.loop();
- //saveData.loop();
+ saveData.loop();
  printData.loop();
  kalman.roverGPS.loop();
- if(kalmanCoroutine.readyState){
-    kalmanCoroutine.reset();
+
+ if(kalmanCoroutine.readyState)
+  updateIMU();
+
+ if(SerializeDataEnabled){
+    if(printData.readyState){
+      serializeData();
+    }
+  }
+
+  //Checks if an object is close, if object detection enabled.
+  if(objectDetection)
+    updateObstacleDetection();
+
+ updateStates(); //Updates the state machine.
+    if(SDRecord)
+   updateRecording(); //Updates recording to SD card.
+ driveCoroutine.reset();
+ avoid.reset();
+ printData.reset();
+
+}
+
+
+void AutonomousDrive::updateIMU(){
+   kalmanCoroutine.reset();
    kalman.loop();
 
     //Updates the ultrasound if object detection enabled.
@@ -118,20 +140,12 @@ void AutonomousDrive::loop() {
    bearing = kalman.roverGPS.bearing;
    difference = abs(heading-bearing);
 
-
-   
-     if(kalman.destinationReached()){
+   if(kalman.destinationReached()){
         machine = SUCCESS;
      }
-  }
-  if(SerializeDataEnabled){
-    if(printData.readyState){
-      serializeData();
-    }
-  }
+}
 
-  //Checks if an object is close, if object detection enabled.
-  if(objectDetection){
+void AutonomousDrive::updateObstacleDetection(){
     //The ultrasonic sensors cannot detect 0 cm. After a certain distance, it will reset to 1000.
     //Ultrasounds at 0 indicates startup.
     if ((echosensorLeft.distance > 0.5f && echosensorLeft.distance <= detectionRange) 
@@ -140,41 +154,35 @@ void AutonomousDrive::loop() {
     {
       machine = BACKUP;
     }
-  }
+}
 
+void AutonomousDrive::updateRecording(){
+
+  if(saveData.readyState){
+    saveSD.closeFile();
+    saveSD.writeFile("RTD.txt");
+  }
+      saveData.reset();
+}
+void AutonomousDrive::updateStates(){
   switch(machine){
 
-    case BACKUP:
-    backup();
-    break;
-    case TRACK:
-    followBearing();
-    break;
-    case AVOID:
-    avoidObstacle();
-    break;
-    case SUCCESS:
-    haltRover();
-    break;
-    case TURNINPLACE:
-    turnInPlace();
-    break;
-  }
-
-
- driveCoroutine.reset();
- avoid.reset();
- printData.reset();
- /*
-if(SDRecord){
- if(saveData.readyState){
-   saveSD.closeFile();
-   saveSD.writeFile("RTD.txt");
-
- }
-    saveData.reset();
-}
-*/
+      case BACKUP:
+      backup();
+      break;
+      case TRACK:
+      followBearing();
+      break;
+      case AVOID:
+      avoidObstacle();
+      break;
+      case SUCCESS:
+      haltRover();
+      break;
+      case TURNINPLACE:
+      turnInPlace();
+      break;
+    }
 
 }
 
@@ -238,16 +246,7 @@ void AutonomousDrive::followBearing(){
     }else if(wheelDirection < -90){
       wheelDirection = -90;
     }
-  //wheelDirection = ((-heading + bearing)/180) *100;
-  
-  /*
-  float wheelDirection = ((180 - abs(abs(bearing-heading)-180))/180) *100; //The magnitude. Decides how much to turn.
-  float diff = heading- bearing;
-  if(diff < 0) //Determines the shortest angle to turn to.
-     diff += 360;
-  if(diff > 180)
-     wheelDirection *= -1;// left turn
-  */
+
   if (abs(heading-bearing) < tolerance){
      reset();
   }else{
@@ -382,4 +381,3 @@ void AutonomousDrive::displaySensorOffsets(const adafruit_bno055_offsets_t &cali
     Serial.print("\nMag Radius: ");
     Serial.print(calibData.mag_radius);
 }
-

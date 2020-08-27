@@ -666,6 +666,7 @@ bool Adafruit_BNO055::getSensorOffsets(
 
     setMode(lastMode);
     return true;
+    
   }
   return false;
 }
@@ -742,6 +743,7 @@ void Adafruit_BNO055::setSensorOffsets(
      Therefore the last byte must be written whenever the user wants to
      changes the configuration. */
 
+
   write8(ACCEL_OFFSET_X_LSB_ADDR, (offsets_type.accel_offset_x) & 0x0FF);
   write8(ACCEL_OFFSET_X_MSB_ADDR, (offsets_type.accel_offset_x >> 8) & 0x0FF);
   write8(ACCEL_OFFSET_Y_LSB_ADDR, (offsets_type.accel_offset_y) & 0x0FF);
@@ -777,7 +779,6 @@ void Adafruit_BNO055::setSensorOffsets(
  *  @return status of calibration
  */
 bool Adafruit_BNO055::isFullyCalibrated() {
-  return true;
   uint8_t system, gyro, accel, mag;
   getCalibration(&system, &gyro, &accel, &mag);
 

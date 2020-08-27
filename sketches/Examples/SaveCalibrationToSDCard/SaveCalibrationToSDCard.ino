@@ -23,6 +23,7 @@ void loop() {
   delay(1000);
   Serial.println("");
   save.saveCalibrationData(caliData);
+  save.write_STRUCT("CALL", caliData);
 }
 
 void calibrate(){
