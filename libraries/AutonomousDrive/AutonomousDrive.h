@@ -36,11 +36,12 @@ class AutonomousDrive {
         double bearing = kalman.roverGPS.bearing; //But you can just call roverGPS (no filter).
         double difference = abs(heading-bearing);
         int wheelDirection = 0;
-        int detectionRange = 0; //Centimeters
         bool objectDetection = true;
         bool SDRecord = true;
         bool SerializeDataEnabled = true;
-        double backupMeters = 1; //How much to backup calculated in meters.
+        double backupMeters = 0.5; //How much to backup calculated in meters.
+        int detectionRangeLEFT = 0;
+        int detectionRangeRIGHT = 0;
 
         void setup();
         void setup(bool isManual);

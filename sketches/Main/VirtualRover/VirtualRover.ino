@@ -13,22 +13,23 @@
  * LIST OF VARIABLES THAT CAN BE CHANGED:
  */
 
+
 //THESE VARIABLES ARE TO BE CHANGED BY USER.
-int detectionRange = 40; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+int detectionRangeLEFT = 20; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+int detectionRangeRIGHT = 80;
 float accuracyRadius = 5; //How close to destination before succeeding. IN METERS. 
 
 //Changes the pins of the ultrasound:
 int LeftTrigPin = 7;
 int LeftRecievePin = 8;
-int RightTrigPin = 9;
-int RightRecievePin = 10;
+int RightTrigPin = 4;
+int RightRecievePin = 3;
 
-bool ObjectDetectionEnabled = true; //Turns on or off obstacle avoidance.
-
+bool ObjectDetectionEnabled = true; //Turns on or off obstacle avoidance. Note: TURN OFF IF NO ULTRASOUND IS CONNECTED.
 
 bool SDRecordingEnabled = false; //Turns on or off SD card recordings. NOTE: you need an SD card, otherwise turn it off!
 
-bool SerializeDataEnabled = false; //Turns on or off data in the serial monitor. Note: turning off will improve performance. THIS NEEDS TO BE ON FOR SD CARD RECORDINGS.
+bool SerializeDataEnabled = true; //Turns on or off data in the serial monitor. Note: turning off will improve performance. THIS NEEDS TO BE ON FOR SD CARD RECORDINGS.
 
 
 //Do not touch below
@@ -84,18 +85,18 @@ void setupAutoDrive(){
      autoDrive.kalman.destinations[i] = (double)dests[i];
   }
 
-  autoDrive.detectionRange = detectionRange;
-    autoDrive.objectDetection = ObjectDetectionEnabled;
+  autoDrive.detectionRangeLEFT = detectionRangeLEFT;
+  autoDrive.detectionRangeRIGHT = detectionRangeRIGHT;
+  autoDrive.objectDetection = ObjectDetectionEnabled;
   autoDrive.LeftTrigPin = LeftTrigPin;
   autoDrive.LeftRecievePin = LeftRecievePin;
   autoDrive.RightTrigPin = RightTrigPin;
   autoDrive.RightRecievePin = RightRecievePin;
-   autoDrive.kalman.destinationRadius = accuracyRadius;
+  autoDrive.setup();
+  autoDrive.kalman.destinationRadius = accuracyRadius;
 
-   
   autoDrive.SDRecord = SDRecordingEnabled;
   autoDrive.SerializeDataEnabled = SerializeDataEnabled;
-  autoDrive.setup();
 }
 
 

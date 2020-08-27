@@ -148,8 +148,8 @@ void AutonomousDrive::updateIMU(){
 void AutonomousDrive::updateObstacleDetection(){
     //The ultrasonic sensors cannot detect 0 cm. After a certain distance, it will reset to 1000.
     //Ultrasounds at 0 indicates startup.
-    if ((echosensorLeft.distance > 0.5f && echosensorLeft.distance <= detectionRange) 
-    || (echosensorRight.distance > 0.5f && echosensorRight.distance <= detectionRange+60))
+    if ((echosensorLeft.distance > 0.5f && echosensorLeft.distance <= detectionRangeLEFT) 
+    || (echosensorRight.distance > 0.5f && echosensorRight.distance <= detectionRangeRIGHT+60))
     
     {
       machine = BACKUP;
@@ -205,7 +205,8 @@ void AutonomousDrive::turnInPlace(){
 
 void AutonomousDrive::avoidObstacle(){
 
-  if(driveToMeter(2)){
+  forwards(90);
+  if(driveToMeter(1)){
     machine = TRACK;
     avoid.reset();
   }

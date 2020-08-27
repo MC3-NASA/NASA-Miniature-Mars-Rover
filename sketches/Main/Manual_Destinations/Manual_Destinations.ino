@@ -23,12 +23,13 @@ void SetYourDestinationsHere(){
    * gps.setDestinations(41.176001, -74.274005, 4);
    */
 
-  gps.setDestinations(40.082099, -75.163366, 0); //Note this was used for personal testing. Can be deleted in final build.
+  gps.setDestinations(40.082008, -75.163452, 0); //Note this was used for personal testing. Can be deleted in final build.
 }
 
 
 //THESE VARIABLES ARE TO BE CHANGED BY USER.
-int detectionRange = 20; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+int detectionRangeLEFT = 20; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+int detectionRangeRIGHT = 80;
 float accuracyRadius = 5; //How close to destination before succeeding. IN METERS. 
 
 //Changes the pins of the ultrasound:
@@ -49,7 +50,8 @@ bool SerializeDataEnabled = true; //Turns on or off data in the serial monitor. 
 
 
 void setup() {
-  autoDrive.detectionRange = detectionRange;
+  autoDrive.detectionRangeLEFT = detectionRangeLEFT;
+  autoDrive.detectionRangeRIGHT = detectionRangeRIGHT;
   autoDrive.objectDetection = ObjectDetectionEnabled;
   autoDrive.LeftTrigPin = LeftTrigPin;
   autoDrive.LeftRecievePin = LeftRecievePin;
