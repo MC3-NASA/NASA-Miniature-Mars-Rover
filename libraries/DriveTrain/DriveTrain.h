@@ -53,6 +53,7 @@ class DriveTrain {
 	void turn(float, int, byte);
 	void CalculateWheelSpeed(float speed, float turningRadius);
 	bool zeroRadiusTurn(float angle, orientation orient); //Turns to a specified angle using the gyroscope.
+	void swapSpeeds(float *x, float *y);
 
 	float d1 = 7.254f; //inches. Horizontal distance between middle rover and corner wheels.
     float d2 = 10.5f; //Verticle distance middle rover and corner wheels.
@@ -70,7 +71,7 @@ class DriveTrain {
 	float minimumRadius = 20;
 
 	bool goalReachedSpin=false, goalAttemptingSpin=false;
-	float currentAngle;
+	float currentAngle; //Used FOR ZERO RADIUS TURN.
 	float angleGoal;
 	bool spining=false;
 	

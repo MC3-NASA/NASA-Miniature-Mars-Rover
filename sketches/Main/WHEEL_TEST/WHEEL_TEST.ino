@@ -32,10 +32,11 @@ void loop() {
       forwards(-30);
       serializeData(0);
       delay(5000);
-      forwards(40);
+      forwards(100);
       spin(80, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
       serializeData(80);
       delay(5000);
+      forwards(-50);
       spin(-80, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
       serializeData(-80);
       delay(5000);
@@ -46,7 +47,7 @@ void loop() {
 }
 
 
-void forwards(int speed) {
+void forwards(float speed) {
   drive.forward(speed);
 }
 

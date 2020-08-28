@@ -59,7 +59,8 @@ void DriveTrain::setup() {
 
 void DriveTrain::forward(float speed) {
 	MainSpeed = speed;
-	if(V1+V2+V3+V4+V5+V6 < 0.1f){
+	//Used for first initial start.
+	if(abs(V1)+abs(V2)+abs(V3)+abs(V4)+abs(V5)+abs(V6) < 0.1f){
 		CalculateWheelSpeed(speed, 0);
 	}
 	if(abs(speed) < 1){
@@ -96,9 +97,6 @@ void DriveTrain::forward(float speed) {
 		}
 	}
 	*/
-if(abs(speed) < 1){
-
-}
 }
 
 void DriveTrain::backward(float speed) {
@@ -140,6 +138,8 @@ void DriveTrain::turn(float angle, byte motors) {
 			if(wheels[i]._id == layout.rightBottomS)	(((motors) & (1<<(3)))) ?  wheels[i].turn(-angle) : wheels[i].turn(0);
 		}
 	}
+
+	forward(MainSpeed);
 }
 
 void DriveTrain::turn(float angle, int speed, byte motors) {
@@ -280,6 +280,7 @@ void DriveTrain::stop() {
 }
 
 void DriveTrain::CalculateWheelSpeed(float speed, float direction){
+
 	    if(abs(direction) > 0){
 			float turningRadius = 250-abs(((float)direction / 100) * 250);
 			turningRadius = constrain(turningRadius, 20, 250);
@@ -294,6 +295,9 @@ void DriveTrain::CalculateWheelSpeed(float speed, float direction){
 			V1 = constrain(V1, 0, 100);
 			V2 = constrain(V2, 0, 100);
 			V3 = constrain(V3, 0, 100);
+
+
+			//Inside wheels when turning right by defualt.
 			V4 = constrain(V4, 0, 100);
 			V5 = constrain(V5, 0, 100);
 			V6 = constrain(V6, 0, 100);
@@ -304,6 +308,14 @@ void DriveTrain::CalculateWheelSpeed(float speed, float direction){
 			V4 = speed;
 			V5 = speed;
 			V6 = speed;
+		}
+		
+
+		//When it turns left the diagram shifts, inner wheels swap speeds.
+		if(direction > 0){
+			swapSpeeds(&V1, &V4);
+			swapSpeeds(&V2, &V5);
+			swapSpeeds(&V3, &V6);
 		}
 
 }
@@ -370,3 +382,10 @@ bool DriveTrain::zeroRadiusTurn(float desiredAngle, orientation orient){
 	return goalReachedSpin;
 }
 
+//Swaps two numbers used when going left or right.
+void DriveTrain::swapSpeeds(float *x, float *y){
+	float t;
+	t = *x;
+	*x = *y;
+	*y = t;
+}
