@@ -313,6 +313,7 @@ void DriveTrain::CalculateWheelSpeed(float speed, float direction){
 
 		//When it turns left the diagram shifts, inner wheels swap speeds.
 		if(direction > 0){
+
 			swapSpeeds(&V1, &V4);
 			swapSpeeds(&V2, &V5);
 			swapSpeeds(&V3, &V6);
