@@ -48,6 +48,7 @@ class DriveTrain {
 	void forward(float);					// Forward for all driving motors
 	void backward(float);					// similar to forward but reverse(technically not nessarcy but separate implementation for naming purpose)
 	void spin(float);						// Spin in place for speed
+	void moveRight(float);						// Moves vehicle to the right.
 	void stop();							// Stops all motors and all servo are set to angle zero
 	void turn(float, byte); 					// turn a specified angle for all turning motors
 	void turn(float, int, byte);

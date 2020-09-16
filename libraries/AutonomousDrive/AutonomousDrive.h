@@ -20,6 +20,7 @@ class AutonomousDrive {
         AVOID,
         SUCCESS,
         TURNINPLACE,
+        MOVERIGHT,
         };
 
         Rover machine;
@@ -39,7 +40,7 @@ class AutonomousDrive {
         bool objectDetection = true;
         bool SDRecord = true;
         bool SerializeDataEnabled = true;
-        double backupMeters = 0.5; //How much to backup calculated in meters.
+        double backupMeters = 1.25; //How much to backup calculated in meters.
         int detectionRangeLEFT = 0;
         int detectionRangeRIGHT = 0;
 
@@ -62,4 +63,5 @@ class AutonomousDrive {
         void updateObstacleDetection();
         void updateRecording();
         void updateStates();
+        void moveRight();
 };

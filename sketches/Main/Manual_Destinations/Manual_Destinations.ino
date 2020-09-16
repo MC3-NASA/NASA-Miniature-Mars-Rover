@@ -23,14 +23,14 @@ void SetYourDestinationsHere(){
    * gps.setDestinations(41.176001, -74.274005, 4);
    */
 
-  gps.setDestinations(40.082008, -75.163452, 0); //Note this was used for personal testing. Can be deleted in final build.
+  gps.setDestinations(40.082328, -75.163536, 0); //Note this was used for personal testing. Can be deleted in final build.
 }
 
 
 //THESE VARIABLES ARE TO BE CHANGED BY USER.
 int detectionRangeLEFT = 20; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
 int detectionRangeRIGHT = 80;
-float accuracyRadius = 5; //How close to destination before succeeding. IN METERS. 
+float accuracyRadius = 2; //How close to destination before succeeding. IN METERS. 
 
 //Changes the pins of the ultrasound:
 int LeftTrigPin = 7;
@@ -40,7 +40,7 @@ int RightRecievePin = 3;
 
 bool ObjectDetectionEnabled = true; //Turns on or off obstacle avoidance. Note: TURN OFF IF NO ULTRASOUND IS CONNECTED.
 
-bool SDRecordingEnabled = false; //Turns on or off SD card recordings. NOTE: you need an SD card, otherwise turn it off!
+bool SDRecordingEnabled = true; //Turns on or off SD card recordings. NOTE: you need an SD card, otherwise turn it off!
 
 bool SerializeDataEnabled = true; //Turns on or off data in the serial monitor. Note: turning off will improve performance. THIS NEEDS TO BE ON FOR SD CARD RECORDINGS.
 
