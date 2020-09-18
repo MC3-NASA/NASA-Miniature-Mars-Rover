@@ -207,33 +207,37 @@ void DriveTrain::turn(float angle, int speed, byte motors) {
 	
 }
 
+void DriveTrain::spin(float speed)
+{
+	float S1 = speed; //Speed of front left wheel.
+	float S2 = speed; //Speed of middle left  wheel.
+	float S3 = speed; //Speed of bottom left wheel.
 
-void DriveTrain::spin(float speed) {
-	MainSpeed = speed;
-	CalculateWheelSpeed(MainSpeed, 90);
+	float S4 = speed; //Speed of front right wheel.
+	float S5 = speed; //Speed of middle right wheel.
+	float S6 = speed; //Speed of bottom right wheel.
+
+	int a1 = -75; // Left bottom servo
+	int a2 = 75;  // Left top servo
+	int a3 = -75; // Right top servo
+	int a4 = 75;  // Right bottom servo
+
+	/* TURNS WHEELS */
 	for (int i = 6; i < 10; i++)
 	{
-
-#ifdef DEBUG
-		Serial.println("Turn");
-		Serial.print("Motor Wheel id: ");
-		Serial.println(wheels[i]._id);
-		Serial.println("");
-#endif
-
 		if (wheels[i]._msState == SERVOL)
 		{
 			if (wheels[i]._id == layout.leftBottomS)
 				wheels[i].turn(120);
 			else
-				wheels[i].turn(70);
+				wheels[i].turn(a2);
 		}
 		else if (wheels[i]._msState == SERVOR)
 		{
 			if (wheels[i]._id == layout.rightTopS)
-				wheels[i].turn(120);
+				wheels[i].turn(a3);
 			else
-				wheels[i].turn(70);
+				wheels[i].turn(a4);
 		}
 	}
 
@@ -241,29 +245,74 @@ void DriveTrain::spin(float speed) {
 
 	for (int i = 0; i < 6; i++)
 	{
-#ifdef DEBUG
-		Serial.println("Forward Turning");
-		Serial.print("Motor Wheel id: ");
-		Serial.println(wheels[i]._id);
-		Serial.println("");
-#endif
+		if (wheels[i]._id == layout.leftTop)
+			wheels[i].forward(S1);
+		if (wheels[i]._id == layout.leftMid)
+			wheels[i].forward(S2);
+		if (wheels[i]._id == layout.leftBack)
+			wheels[i].forward(S3);
 
-		if (wheels[i]._msState == MOTORL)
+		if (wheels[i]._id == layout.rightTop)
+			wheels[i].forward(S4);
+		if (wheels[i]._id == layout.rightMid)
+			wheels[i].forward(S5);
+		if (wheels[i]._id == layout.rightBack)
+			wheels[i].forward(S6);
+	}
+}
+
+void DriveTrain::moveRight(float speed)
+{
+	float S1 = speed; //Speed of front left wheel.
+	float S2 = speed; //Speed of middle left  wheel.
+	float S3 = speed; //Speed of bottom left wheel.
+
+	float S4 = -speed; //Speed of front right wheel.
+	float S5 = -speed; //Speed of middle right wheel.
+	float S6 = -speed; //Speed of bottom right wheel.
+
+	int a1 = 75; // Left bottom servo
+	int a2 = 75;  // Left top servo
+	int a3 = 75; // Right top servo
+	int a4 = 75;  // Right bottom servo
+
+	/* TURNS WHEELS */
+	for (int i = 6; i < 10; i++)
+	{
+		if (wheels[i]._msState == SERVOL)
 		{
-			if (wheels[i]._id == layout.leftBack)
-				wheels[i].forward(-speed + differential);
+			if (wheels[i]._id == layout.leftBottomS)
+				wheels[i].turn(a1);
 			else
-				wheels[i].forward(speed + differential);
+				wheels[i].turn(a2);
 		}
-		else if (wheels[i]._msState == MOTORR)
+		else if (wheels[i]._msState == SERVOR)
 		{
 			if (wheels[i]._id == layout.rightTop)
 				wheels[i].forward(-speed -differential);
 			else if (wheels[i]._id == layout.rightMid)
 				wheels[i].forward(-speed+differential);
 			else
-				wheels[i].forward(speed + -differential);
+				wheels[i].turn(a4);
 		}
+	}
+
+	/* MOVE WHEELS */
+	for (int i = 0; i < 6; i++)
+	{
+		if (wheels[i]._id == layout.leftTop)
+			wheels[i].forward(S1);
+		if (wheels[i]._id == layout.leftMid)
+			wheels[i].forward(S2);
+		if (wheels[i]._id == layout.leftBack)
+			wheels[i].forward(S3);
+
+		if (wheels[i]._id == layout.rightTop)
+			wheels[i].forward(S4);
+		if (wheels[i]._id == layout.rightMid)
+			wheels[i].forward(S5);
+		if (wheels[i]._id == layout.rightBack)
+			wheels[i].forward(S6);
 	}
 }
 
@@ -325,7 +374,7 @@ void DriveTrain::CalculateWheelSpeed(float speed, float direction){
 
 bool DriveTrain::zeroRadiusTurn(float desiredAngle, orientation orient){
 
-	float speed = 90;
+	float speed = 100;
 	float tolerance = 10; // degrees
 	orient.computeAngle();
 	

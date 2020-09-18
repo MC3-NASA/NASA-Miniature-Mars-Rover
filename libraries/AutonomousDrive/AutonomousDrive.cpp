@@ -102,8 +102,11 @@ void AutonomousDrive::loop() {
  printData.loop();
  kalman.roverGPS.loop();
 
- if(kalmanCoroutine.readyState)
-  updateIMU();
+ if(kalmanCoroutine.readyState){
+   updateIMU();
+   updateStates(); //Updates the state machine.
+ }
+
 
  if(SerializeDataEnabled){
     if(printData.readyState){
@@ -115,7 +118,6 @@ void AutonomousDrive::loop() {
   if(objectDetection)
     updateObstacleDetection();
 
- updateStates(); //Updates the state machine.
     if(SDRecord)
    updateRecording(); //Updates recording to SD card.
  driveCoroutine.reset();
@@ -182,6 +184,9 @@ void AutonomousDrive::updateStates(){
       case TURNINPLACE:
       turnInPlace();
       break;
+      case MOVERIGHT:
+      moveRight();
+      break;
     }
 
 }
@@ -190,7 +195,7 @@ void AutonomousDrive::backup(){
   reset();
   forwards(-80);
   if(driveToMeter(backupMeters)){
-    machine = TURNINPLACE;
+    machine = MOVERIGHT;
     avoid.reset();
   }
 
@@ -203,10 +208,21 @@ void AutonomousDrive::turnInPlace(){
     }
 }
 
+void AutonomousDrive::moveRight()
+{
+
+  drive.moveRight(100);
+  if (driveToMeter(backupMeters/2))
+  {
+    machine = TRACK;
+    avoid.reset();
+  }
+}
+
 void AutonomousDrive::avoidObstacle(){
 
   forwards(90);
-  if(driveToMeter(1)){
+  if(driveToMeter(backupMeters)){
     machine = TRACK;
     avoid.reset();
   }
@@ -242,16 +258,16 @@ void AutonomousDrive::followBearing(){
         wheelDirection = angle3;
     }
     //Clamps the values.
-    if(wheelDirection > 90){
-      wheelDirection = 90;
-    }else if(wheelDirection < -90){
-      wheelDirection = -90;
+    if(wheelDirection > 75){
+      wheelDirection = 75;
+    }else if(wheelDirection < -75){
+      wheelDirection = -75;
     }
 
   if (abs(heading-bearing) < tolerance){
      reset();
   }else{
-    forwards(90);
+    forwards(100);
     spin(wheelDirection, LEFTTOP | RIGHTTOP | LEFTBOTTOM | RIGHTBOTTOM);
   }
 }
