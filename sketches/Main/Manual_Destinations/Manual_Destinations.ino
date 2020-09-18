@@ -15,7 +15,7 @@ void SetYourDestinationsHere(){
 
 //Paste your destinations in here. Examples:
 
-  //gps.setDestinations(40.176001, -75.274005, 0); //Goes to Montgomery County Community College.
+  gps.setDestinations(40.176001, -75.274005, 0); //Goes to Montgomery County Community College.
   /*
    * gps.setDestinations(42.176001, -72.274005, 1);
    * gps.setDestinations(44.176001, -71.274005, 2);
@@ -23,13 +23,12 @@ void SetYourDestinationsHere(){
    * gps.setDestinations(41.176001, -74.274005, 4);
    */
 
-  gps.setDestinations(40.082328, -75.163536, 0); //Note this was used for personal testing. Can be deleted in final build.
 }
 
 
 //THESE VARIABLES ARE TO BE CHANGED BY USER.
-int detectionRangeLEFT = 20; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
-int detectionRangeRIGHT = 80;
+int detectionRangeLEFT = 35; //CENTIMETERS. DETERMINES HOW FAR OBJECT CAN BE DETECTED BEFORE TURNING.
+int detectionRangeRIGHT = 35;
 float accuracyRadius = 2; //How close to destination before succeeding. IN METERS. 
 
 //Changes the pins of the ultrasound:
