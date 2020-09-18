@@ -224,7 +224,7 @@ void DriveTrain::spin(float speed) {
 		if (wheels[i]._msState == SERVOL)
 		{
 			if (wheels[i]._id == layout.leftBottomS)
-				wheels[i].turn(115);
+				wheels[i].turn(120);
 			else
 				wheels[i].turn(70);
 		}
@@ -237,7 +237,7 @@ void DriveTrain::spin(float speed) {
 		}
 	}
 
-	float differential = (speed > 0) ? 10 : -10;
+	float differential = (speed > 0) ? 20 : -20;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -258,7 +258,9 @@ void DriveTrain::spin(float speed) {
 		else if (wheels[i]._msState == MOTORR)
 		{
 			if (wheels[i]._id == layout.rightTop)
-				wheels[i].forward(-speed + -differential);
+				wheels[i].forward(-speed -differential);
+			else if (wheels[i]._id == layout.rightMid)
+				wheels[i].forward(-speed+differential);
 			else
 				wheels[i].forward(speed + -differential);
 		}
